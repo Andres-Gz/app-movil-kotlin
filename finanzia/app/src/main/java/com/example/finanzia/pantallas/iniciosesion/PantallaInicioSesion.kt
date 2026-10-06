@@ -17,6 +17,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -34,6 +37,8 @@ import com.example.finanzia.componentes.CasillaVerificacion
 import com.example.finanzia.componentes.LogoMarca
 import com.example.finanzia.componentes.SeparadorConTexto
 import com.example.finanzia.componentes.TextoEnlace
+import com.example.finanzia.datos.modelos.Usuario
+import com.example.finanzia.datos.repositorios.RepositorioSesionSupabase
 import com.example.finanzia.tema.Colores
 import com.example.finanzia.tema.Dimensiones
 import com.example.finanzia.tema.EstilosTexto
@@ -43,24 +48,31 @@ import com.example.finanzia.tema.TemaFinanzia
 /**
  * Pantalla de inicio de sesión. El estado vive en [InicioSesionViewModel];
  * la navegación se delega a quien la muestra mediante los callbacks.
+ * Cuando el inicio de sesión sale bien, avisa con [alIniciarSesion] y el usuario.
  */
 @Composable
 fun PantallaInicioSesion(
     alVolver: () -> Unit,
-    alIniciarSesion: () -> Unit,
+    alIniciarSesion: (Usuario) -> Unit,
     alOlvidarContrasena: () -> Unit,
     alRegistrarse: () -> Unit,
     alCambiarTema: () -> Unit,
     alPedirAyuda: () -> Unit,
-    viewModel: InicioSesionViewModel = viewModel(),
+    viewModel: InicioSesionViewModel = viewModel { InicioSesionViewModel(RepositorioSesionSupabase()) },
 ) {
+    val estado = viewModel.estado
+    val alIniciarSesionActual by rememberUpdatedState(alIniciarSesion)
+    LaunchedEffect(estado.usuario) {
+        estado.usuario?.let(alIniciarSesionActual)
+    }
+
     ContenidoInicioSesion(
-        estado = viewModel.estado,
+        estado = estado,
         alCambiarCorreo = viewModel::alCambiarCorreo,
         alCambiarContrasena = viewModel::alCambiarContrasena,
         alAlternarVisibilidadContrasena = viewModel::alAlternarVisibilidadContrasena,
         alCambiarRecordarme = viewModel::alCambiarRecordarme,
-        alEntrar = { if (viewModel.alPulsarEntrar()) alIniciarSesion() },
+        alEntrar = viewModel::alPulsarEntrar,
         alVolver = alVolver,
         alOlvidarContrasena = alOlvidarContrasena,
         alRegistrarse = alRegistrarse,
@@ -155,10 +167,21 @@ private fun ContenidoInicioSesion(
                 )
             }
             Spacer(Modifier.height(Dimensiones.espacioMediano))
+            if (estado.errorGeneral != null) {
+                Text(
+                    text = stringResource(estado.errorGeneral),
+                    style = EstilosTexto.nota,
+                    color = Colores.error,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                Spacer(Modifier.height(Dimensiones.espacioPequeno))
+            }
             BotonDegradado(
                 texto = stringResource(R.string.inicio_sesion_boton_entrar),
                 alPulsar = alEntrar,
                 iconoFinal = Iconos.continuar,
+                cargando = estado.cargando,
             )
 
             Spacer(Modifier.height(Dimensiones.espacioGrande))

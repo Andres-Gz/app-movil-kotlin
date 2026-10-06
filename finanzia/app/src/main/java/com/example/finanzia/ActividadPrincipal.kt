@@ -1,6 +1,7 @@
 package com.example.finanzia
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
@@ -21,8 +22,12 @@ class ActividadPrincipal : ComponentActivity() {
             TemaFinanzia {
                 PantallaInicioSesion(
                     alVolver = onBackPressedDispatcher::onBackPressed,
-                    // Aún no existen las pantallas de destino.
-                    alIniciarSesion = {},
+                    // Temporal: aún no existe la pantalla principal, así que solo saludamos.
+                    alIniciarSesion = { usuario ->
+                        val saludo = getString(R.string.inicio_sesion_bienvenida, usuario.nombre)
+                        Toast.makeText(this@ActividadPrincipal, saludo, Toast.LENGTH_LONG).show()
+                    },
+                    // Aún no existen estas pantallas.
                     alOlvidarContrasena = {},
                     alRegistrarse = {},
                     alCambiarTema = {},

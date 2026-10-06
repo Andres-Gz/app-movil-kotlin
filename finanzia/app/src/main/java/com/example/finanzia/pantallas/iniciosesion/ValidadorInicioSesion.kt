@@ -1,12 +1,13 @@
 package com.example.finanzia.pantallas.iniciosesion
 
 import androidx.annotation.StringRes
+import com.example.finanzia.configuracion.Constantes
 import com.example.finanzia.R
 
 /** Reglas del formulario de inicio de sesión: devuelven el texto de error, o `null` si el valor es válido. */
 object ValidadorInicioSesion {
 
-    private val formatoCorreo = Regex("""^[^\s@]+@[^\s@]+\.[^\s@]+$""")
+    private val formatoCorreo = Regex(Constantes.Validacion.PATRON_CORREO)
 
     @StringRes
     fun validarCorreo(correo: String): Int? = when {
