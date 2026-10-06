@@ -32,6 +32,7 @@ object Dimensiones {
     // Bordes y sombras
     val grosorBorde = 1.dp
     val grosorBordeCasilla = 1.5.dp
+    val grosorIndicadorCarga = 2.dp
     val elevacionCampo = 2.dp
     val elevacionBotonIcono = 4.dp
     val elevacionBoton = 10.dp

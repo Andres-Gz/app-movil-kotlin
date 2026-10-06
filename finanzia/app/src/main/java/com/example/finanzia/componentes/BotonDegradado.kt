@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,13 +25,17 @@ import com.example.finanzia.tema.Colores
 import com.example.finanzia.tema.Dimensiones
 import com.example.finanzia.tema.EstilosTexto
 
-/** Botón principal de ancho completo con fondo en degradado y un icono opcional al final. */
+/**
+ * Botón principal de ancho completo con fondo en degradado y un icono opcional al final.
+ * Con [cargando] muestra un indicador de progreso en lugar del icono y no se puede pulsar.
+ */
 @Composable
 fun BotonDegradado(
     texto: String,
     alPulsar: () -> Unit,
     modifier: Modifier = Modifier,
     iconoFinal: ImageVector? = null,
+    cargando: Boolean = false,
 ) {
     val forma = RoundedCornerShape(Dimensiones.radioBoton)
     Row(
@@ -40,12 +45,19 @@ fun BotonDegradado(
             .shadow(Dimensiones.elevacionBoton, forma, ambientColor = Colores.sombraBoton, spotColor = Colores.sombraBoton)
             .background(Brush.horizontalGradient(Colores.degradadoBoton), forma)
             .clip(forma)
-            .clickable(role = Role.Button, onClick = alPulsar),
+            .clickable(enabled = !cargando, role = Role.Button, onClick = alPulsar),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(text = texto, style = EstilosTexto.cuerpoDestacado, color = Colores.textoSobreColor)
-        if (iconoFinal != null) {
+        if (cargando) {
+            Spacer(Modifier.width(Dimensiones.espacioPequeno))
+            CircularProgressIndicator(
+                color = Colores.textoSobreColor,
+                strokeWidth = Dimensiones.grosorIndicadorCarga,
+                modifier = Modifier.size(Dimensiones.tamanoIconoPequeno),
+            )
+        } else if (iconoFinal != null) {
             Spacer(Modifier.width(Dimensiones.espacioPequeno))
             Icon(
                 imageVector = iconoFinal,
