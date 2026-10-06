@@ -1,0 +1,33 @@
+<resources>
+    <!-- General -->
+    <string name="nombre_app">Finanzia</string>
+
+    <!-- Pantalla: inicio de sesión -->
+    <string name="inicio_sesion_titulo_barra">Iniciar sesión</string>
+    <string name="inicio_sesion_eslogan">Tu asistente financiero con IA</string>
+    <string name="inicio_sesion_saludo">¡Qué bueno verte! 👋</string>
+    <string name="inicio_sesion_descripcion">Inicia sesión para continuar y seguir creciendo tus metas.</string>
+    <string name="inicio_sesion_etiqueta_correo">Correo electrónico</string>
+    <string name="inicio_sesion_ejemplo_correo">ejemplo@correo.com</string>
+    <string name="inicio_sesion_etiqueta_contrasena">Contraseña</string>
+    <string name="inicio_sesion_ejemplo_contrasena">••••••••••••</string>
+    <string name="inicio_sesion_recordarme">Recordarme</string>
+    <string name="inicio_sesion_olvide_contrasena">¿Olvidaste tu contraseña?</string>
+    <string name="inicio_sesion_boton_entrar">Entrar</string>
+    <string name="inicio_sesion_separador">o continúa con</string>
+    <string name="inicio_sesion_sin_cuenta">¿No tienes cuenta?</string>
+    <string name="inicio_sesion_registrarse">Regístrate gratis</string>
+    <string name="inicio_sesion_datos_protegidos">Tus datos están protegidos</string>
+
+    <!-- Errores de validación -->
+    <string name="error_correo_vacio">Ingresa tu correo electrónico</string>
+    <string name="error_correo_invalido">Ingresa un correo válido</string>
+    <string name="error_contrasena_vacia">Ingresa tu contraseña</string>
+
+    <!-- Descripciones de accesibilidad -->
+    <string name="accion_volver">Volver</string>
+    <string name="accion_cambiar_tema">Cambiar tema</string>
+    <string name="accion_ayuda">Ayuda</string>
+    <string name="accion_mostrar_contrasena">Mostrar contraseña</string>
+    <string name="accion_ocultar_contrasena">Ocultar contraseña</string>
+</resources>

@@ -1,0 +1,8 @@
+# Configuración personal del IDE: cada quien tiene la suya
+.idea/
+*.iml
+
+# Archivos que crea el sistema operativo
+.DS_Store
+Thumbs.db
+desktop.ini
