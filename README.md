@@ -7,7 +7,7 @@ Tu asistente financiero con IA. App Android hecha con Kotlin y Jetpack Compose.
 ## Requisitos
 
 - [Android Studio](https://developer.android.com/studio) reciente. Trae su propio JDK, así que no hace falta instalar Java aparte.
-- Android SDK 37. Android Studio lo descarga al abrir el proyecto.
+- Android SDK 36. Android Studio lo descarga al abrir el proyecto.
 - Un emulador o un teléfono con Android 7.0 (API 24) o superior.
 
 ## Configuración
@@ -174,8 +174,8 @@ En español, contando qué cambia y por qué. El asunto es corto y en presente, 
 ## Notas técnicas
 
 - Las dependencias se declaran solo en `gradle/libs.versions.toml`. Las de Compose van sin versión porque la fija el BOM.
-- El proyecto usa AGP 9, que ya trae soporte para Kotlin: **no** agregues el plugin `org.jetbrains.kotlin.android`.
-- Las reglas de R8 para la versión de lanzamiento van en `app/src/main/keepRules/`.
+- El proyecto usa AGP 8.13 con Gradle 8.14 para que abra también en las versiones de Android Studio de la universidad. Con AGP 8 el plugin `org.jetbrains.kotlin.android` sí es necesario.
+- La versión de lanzamiento todavía no se minifica (`isMinifyEnabled = false`).
 - Material 3 ya no incluye iconos: usamos `material-icons-extended`, siempre a través de `tema/Iconos.kt`.
 - Supabase se usa con [supabase-kt](https://github.com/supabase-community/supabase-kt) 3.2.6, la última versión compatible con nuestro Kotlin 2.2 (desde la 3.7 pide Kotlin 2.4).
 - El inicio de sesión lo hace Supabase Auth. La tabla `usuarios` solo aporta el perfil (se busca por correo) y la app nunca lee su columna `contrasena`.
