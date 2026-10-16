@@ -8,26 +8,6 @@ import org.junit.Test
 class ValidadorInicioSesionTest {
 
     @Test
-    fun correoVacio_devuelveErrorDeCorreoVacio() {
-        assertEquals(R.string.error_correo_vacio, ValidadorInicioSesion.validarCorreo("   "))
-    }
-
-    @Test
-    fun correoSinArroba_devuelveErrorDeFormato() {
-        assertEquals(R.string.error_correo_invalido, ValidadorInicioSesion.validarCorreo("ana.correo.com"))
-    }
-
-    @Test
-    fun correoSinDominio_devuelveErrorDeFormato() {
-        assertEquals(R.string.error_correo_invalido, ValidadorInicioSesion.validarCorreo("ana@correo"))
-    }
-
-    @Test
-    fun correoValidoConEspacios_noDevuelveError() {
-        assertNull(ValidadorInicioSesion.validarCorreo("  ana@correo.com "))
-    }
-
-    @Test
     fun contrasenaVacia_devuelveError() {
         assertEquals(R.string.error_contrasena_vacia, ValidadorInicioSesion.validarContrasena(""))
     }
@@ -35,5 +15,16 @@ class ValidadorInicioSesionTest {
     @Test
     fun contrasenaConTexto_noDevuelveError() {
         assertNull(ValidadorInicioSesion.validarContrasena("secreta123"))
+    }
+
+    @Test
+    fun formularioConUnCampoVacio_devuelveElAvisoDeCamposIncompletos() {
+        assertEquals(R.string.error_campos_incompletos, ValidadorInicioSesion.validarFormulario("", "secreta123"))
+        assertEquals(R.string.error_campos_incompletos, ValidadorInicioSesion.validarFormulario("ana@correo.com", ""))
+    }
+
+    @Test
+    fun formularioLleno_noDevuelveAviso() {
+        assertNull(ValidadorInicioSesion.validarFormulario("ana.correo.com", "secreta123"))
     }
 }

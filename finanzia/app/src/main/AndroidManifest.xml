@@ -16,12 +16,24 @@
         <activity
             android:name=".ActividadPrincipal"
             android:exported="true"
+            android:launchMode="singleTask"
             android:theme="@style/Tema.Finanzia"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <!-- Enlace del correo para recuperar la contraseña (debe coincidir con Constantes.Enlaces). -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="recuperar"
+                    android:scheme="finanzia" />
             </intent-filter>
         </activity>
     </application>

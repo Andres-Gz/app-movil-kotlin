@@ -31,12 +31,9 @@ class PantallaInicioSesionTest {
         reglaCompose.setContent {
             TemaFinanzia {
                 PantallaInicioSesion(
-                    alVolver = {},
                     alIniciarSesion = { usuarioRecibido = it },
                     alOlvidarContrasena = {},
                     alRegistrarse = {},
-                    alCambiarTema = {},
-                    alPedirAyuda = {},
                     viewModel = viewModel { InicioSesionViewModel(RepositorioSesionFalso(respuesta)) },
                 )
             }
@@ -56,6 +53,7 @@ class PantallaInicioSesionTest {
 
         reglaCompose.onNodeWithText(contexto.getString(R.string.inicio_sesion_boton_entrar)).performClick()
 
+        reglaCompose.onNodeWithText(contexto.getString(R.string.error_campos_incompletos)).assertIsDisplayed()
         reglaCompose.onNodeWithText(contexto.getString(R.string.error_correo_vacio)).assertIsDisplayed()
         reglaCompose.onNodeWithText(contexto.getString(R.string.error_contrasena_vacia)).assertIsDisplayed()
         reglaCompose.runOnIdle { assertNull(usuarioRecibido) }
@@ -77,6 +75,7 @@ class PantallaInicioSesionTest {
         llenarYEntrar()
 
         reglaCompose.onNodeWithText(contexto.getString(R.string.error_credenciales_incorrectas)).assertIsDisplayed()
+        reglaCompose.onNodeWithText(contexto.getString(R.string.error_contrasena_no_coincide)).assertIsDisplayed()
         reglaCompose.runOnIdle { assertNull(usuarioRecibido) }
     }
 
