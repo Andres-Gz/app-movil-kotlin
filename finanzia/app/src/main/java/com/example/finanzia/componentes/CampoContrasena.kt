@@ -2,16 +2,14 @@ package com.example.finanzia.componentes
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import com.example.finanzia.R
-import com.example.finanzia.tema.Colores
+import com.example.finanzia.tema.EstilosTexto
 import com.example.finanzia.tema.Iconos
 
-/** Campo de contraseña: oculta el texto y permite mostrarlo con el icono del ojo. */
+/** Campo de contraseña del inicio de sesión: oculta el texto con puntos separados y lo muestra con el ojo. */
 @Composable
 fun CampoContrasena(
     etiqueta: String,
@@ -22,6 +20,7 @@ fun CampoContrasena(
     alAlternarVisibilidad: () -> Unit,
     modifier: Modifier = Modifier,
     mensajeError: String? = null,
+    origenError: OrigenError = OrigenError.FORMULARIO,
     alConfirmar: () -> Unit = {},
 ) {
     CampoTexto(
@@ -32,19 +31,13 @@ fun CampoContrasena(
         icono = Iconos.candado,
         modifier = modifier,
         mensajeError = mensajeError,
+        origenError = origenError,
         tipoTeclado = KeyboardType.Password,
         accionTeclado = ImeAction.Done,
         alConfirmar = alConfirmar,
         transformacionVisual = if (visible) VisualTransformation.None else PasswordVisualTransformation(),
-        iconoFinal = {
-            BotonIcono(
-                icono = if (visible) Iconos.ocultar else Iconos.mostrar,
-                descripcion = stringResource(
-                    if (visible) R.string.accion_ocultar_contrasena else R.string.accion_mostrar_contrasena,
-                ),
-                alPulsar = alAlternarVisibilidad,
-                color = Colores.textoTenue,
-            )
-        },
+        estiloValor = if (visible) EstilosTexto.valorCampo else EstilosTexto.contrasenaOculta,
+        estiloEjemplo = EstilosTexto.contrasenaOculta,
+        botonFinal = { BotonVerContrasena(visible = visible, alAlternar = alAlternarVisibilidad) },
     )
 }

@@ -15,8 +15,8 @@ private val esquemaColores = lightColorScheme(
     surface = Colores.superficie,
     onSurface = Colores.textoPrincipal,
     onSurfaceVariant = Colores.textoSecundario,
-    outline = Colores.divisor,
-    outlineVariant = Colores.divisor,
+    outline = Colores.bordeCampo,
+    outlineVariant = Colores.bordeCampo,
     error = Colores.error,
 )
 

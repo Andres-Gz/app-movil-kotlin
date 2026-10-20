@@ -19,14 +19,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.unit.Dp
 import com.example.finanzia.tema.Colores
 import com.example.finanzia.tema.Dimensiones
 import com.example.finanzia.tema.EstilosTexto
 
 /**
- * Botón principal de ancho completo con fondo en degradado y un icono opcional al final.
+ * Botón principal de ancho completo con fondo en degradado e iconos opcionales al inicio y al final.
  * Con [cargando] muestra un indicador de progreso en lugar del icono y no se puede pulsar.
  */
 @Composable
@@ -35,35 +37,51 @@ fun BotonDegradado(
     alPulsar: () -> Unit,
     modifier: Modifier = Modifier,
     iconoFinal: ImageVector? = null,
+    iconoInicial: ImageVector? = null,
     cargando: Boolean = false,
+    tamanoIcono: Dp = Dimensiones.tamanoIconoMediano,
+    espacioIcono: Dp = Dimensiones.espacioPequeno,
+    radio: Dp = Dimensiones.radioBoton,
+    altura: Dp = Dimensiones.alturaBoton,
+    colorSombra: Color = Colores.sombra,
+    colores: List<Color> = Colores.degradadoBoton,
 ) {
-    val forma = RoundedCornerShape(Dimensiones.radioBoton)
+    val forma = RoundedCornerShape(radio)
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .height(Dimensiones.alturaBoton)
-            .shadow(Dimensiones.elevacionBoton, forma, ambientColor = Colores.sombraBoton, spotColor = Colores.sombraBoton)
-            .background(Brush.horizontalGradient(Colores.degradadoBoton), forma)
+            .height(altura)
+            .shadow(Dimensiones.elevacionBoton, forma, ambientColor = colorSombra, spotColor = colorSombra)
+            .background(Brush.horizontalGradient(colores), forma)
             .clip(forma)
             .clickable(enabled = !cargando, role = Role.Button, onClick = alPulsar),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(text = texto, style = EstilosTexto.cuerpoDestacado, color = Colores.textoSobreColor)
+        if (iconoInicial != null) {
+            Icon(
+                imageVector = iconoInicial,
+                contentDescription = null,
+                tint = Colores.textoSobreColor,
+                modifier = Modifier.size(tamanoIcono),
+            )
+            Spacer(Modifier.width(espacioIcono))
+        }
+        Text(text = texto, style = EstilosTexto.boton, color = Colores.textoSobreColor)
         if (cargando) {
-            Spacer(Modifier.width(Dimensiones.espacioPequeno))
+            Spacer(Modifier.width(espacioIcono))
             CircularProgressIndicator(
                 color = Colores.textoSobreColor,
                 strokeWidth = Dimensiones.grosorIndicadorCarga,
-                modifier = Modifier.size(Dimensiones.tamanoIconoPequeno),
+                modifier = Modifier.size(tamanoIcono),
             )
         } else if (iconoFinal != null) {
-            Spacer(Modifier.width(Dimensiones.espacioPequeno))
+            Spacer(Modifier.width(espacioIcono))
             Icon(
                 imageVector = iconoFinal,
                 contentDescription = null,
                 tint = Colores.textoSobreColor,
-                modifier = Modifier.size(Dimensiones.tamanoIcono),
+                modifier = Modifier.size(tamanoIcono),
             )
         }
     }

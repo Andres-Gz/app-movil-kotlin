@@ -7,9 +7,11 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.finanzia.R
+import com.example.finanzia.componentes.OrigenError
 import com.example.finanzia.datos.repositorios.ErrorSesion
 import com.example.finanzia.datos.repositorios.RepositorioSesion
 import com.example.finanzia.datos.repositorios.ResultadoSesion
+import com.example.finanzia.utilidades.validarCorreo
 import kotlinx.coroutines.launch
 
 /** Mantiene el estado del formulario de inicio de sesión y reacciona a lo que hace el usuario. */
@@ -21,15 +23,11 @@ class InicioSesionViewModel(
         private set
 
     fun alCambiarCorreo(correo: String) {
-        estado = estado.copy(correo = correo, errorCorreo = null, errorGeneral = null)
+        estado = estadoAlEditar().copy(correo = correo, errorCorreo = null)
     }
 
     fun alCambiarContrasena(contrasena: String) {
-        estado = estado.copy(contrasena = contrasena, errorContrasena = null, errorGeneral = null)
-    }
-
-    fun alCambiarRecordarme(recordarme: Boolean) {
-        estado = estado.copy(recordarme = recordarme)
+        estado = estadoAlEditar().copy(contrasena = contrasena, errorContrasena = null)
     }
 
     fun alAlternarVisibilidadContrasena() {
@@ -39,18 +37,49 @@ class InicioSesionViewModel(
     /** Valida el formulario y, si está bien, intenta iniciar sesión. */
     fun alPulsarEntrar() {
         if (estado.cargando) return
-        val errorCorreo = ValidadorInicioSesion.validarCorreo(estado.correo)
+        val errorCorreo = validarCorreo(estado.correo)
         val errorContrasena = ValidadorInicioSesion.validarContrasena(estado.contrasena)
-        estado = estado.copy(errorCorreo = errorCorreo, errorContrasena = errorContrasena, errorGeneral = null)
+        estado = estado.copy(
+            errorCorreo = errorCorreo,
+            errorContrasena = errorContrasena,
+            errorGeneral = ValidadorInicioSesion.validarFormulario(estado.correo, estado.contrasena),
+            origenError = OrigenError.FORMULARIO,
+        )
         if (errorCorreo != null || errorContrasena != null) return
 
         estado = estado.copy(cargando = true)
         viewModelScope.launch {
             estado = when (val resultado = repositorio.iniciarSesion(estado.correo.trim(), estado.contrasena)) {
                 is ResultadoSesion.Exitoso -> estado.copy(cargando = false, usuario = resultado.usuario)
-                is ResultadoSesion.Fallido -> estado.copy(cargando = false, errorGeneral = mensajeDe(resultado.error))
+                is ResultadoSesion.Fallido -> estado.copy(
+                    cargando = false,
+                    errorGeneral = mensajeDe(resultado.error),
+                    errorContrasena = if (resultado.error == ErrorSesion.CREDENCIALES_INCORRECTAS) {
+                        R.string.error_contrasena_no_coincide
+                    } else {
+                        null
+                    },
+                    origenError = OrigenError.SERVIDOR,
+                )
             }
         }
+    }
+
+    /**
+     * La pantalla ya avisó que se inició sesión: el formulario queda limpio (sin la contraseña) y,
+     * si el usuario vuelve a esta pantalla, no se avisa otra vez.
+     */
+    fun alAvisarSesionIniciada() {
+        estado = EstadoInicioSesion()
+    }
+
+    /**
+     * Al editar un campo se quita el aviso. Si los errores los dio el servidor, ya no aplican
+     * a los datos nuevos y se quitan todos.
+     */
+    private fun estadoAlEditar(): EstadoInicioSesion = when (estado.origenError) {
+        OrigenError.FORMULARIO -> estado.copy(errorGeneral = null)
+        OrigenError.SERVIDOR -> estado.copy(errorGeneral = null, errorCorreo = null, errorContrasena = null)
     }
 
     @StringRes

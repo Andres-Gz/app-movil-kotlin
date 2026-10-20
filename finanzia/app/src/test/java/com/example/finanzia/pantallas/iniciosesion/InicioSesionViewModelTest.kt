@@ -1,6 +1,7 @@
 package com.example.finanzia.pantallas.iniciosesion
 
 import com.example.finanzia.R
+import com.example.finanzia.componentes.OrigenError
 import com.example.finanzia.datos.modelos.Usuario
 import com.example.finanzia.datos.repositorios.ErrorSesion
 import com.example.finanzia.datos.repositorios.RepositorioSesion
@@ -42,6 +43,20 @@ class InicioSesionViewModelTest {
 
         assertEquals(R.string.error_correo_vacio, viewModel.estado.errorCorreo)
         assertEquals(R.string.error_contrasena_vacia, viewModel.estado.errorContrasena)
+        assertEquals(R.string.error_campos_incompletos, viewModel.estado.errorGeneral)
+        assertEquals(OrigenError.FORMULARIO, viewModel.estado.origenError)
+        assertEquals(0, repositorio.llamadas)
+    }
+
+    @Test
+    fun correoMalEscritoConContrasena_marcaSoloElCorreoSinAviso() {
+        viewModel.alCambiarCorreo("ana.correo.com")
+        viewModel.alCambiarContrasena("secreta123")
+
+        viewModel.alPulsarEntrar()
+
+        assertEquals(R.string.error_correo_invalido, viewModel.estado.errorCorreo)
+        assertNull(viewModel.estado.errorGeneral)
         assertEquals(0, repositorio.llamadas)
     }
 
@@ -57,6 +72,18 @@ class InicioSesionViewModelTest {
     }
 
     @Test
+    fun alAvisarSesionIniciada_limpiaElFormularioParaNoAvisarOtraVez() {
+        llenarFormulario()
+        viewModel.alPulsarEntrar()
+
+        viewModel.alAvisarSesionIniciada()
+
+        assertNull(viewModel.estado.usuario)
+        assertEquals("", viewModel.estado.contrasena)
+        assertEquals("", viewModel.estado.correo)
+    }
+
+    @Test
     fun alPulsarEntrar_enviaElCorreoSinEspacios() {
         viewModel.alCambiarCorreo("  ana@correo.com ")
         viewModel.alCambiarContrasena("secreta123")
@@ -67,14 +94,28 @@ class InicioSesionViewModelTest {
     }
 
     @Test
-    fun credencialesIncorrectas_muestranElErrorGeneral() {
+    fun credencialesIncorrectas_muestranElAvisoYMarcanLaContrasena() {
         repositorio.respuesta = CompletableDeferred(ResultadoSesion.Fallido(ErrorSesion.CREDENCIALES_INCORRECTAS))
         llenarFormulario()
 
         viewModel.alPulsarEntrar()
 
         assertEquals(R.string.error_credenciales_incorrectas, viewModel.estado.errorGeneral)
+        assertEquals(R.string.error_contrasena_no_coincide, viewModel.estado.errorContrasena)
+        assertNull(viewModel.estado.errorCorreo)
+        assertEquals(OrigenError.SERVIDOR, viewModel.estado.origenError)
         assertNull(viewModel.estado.usuario)
+    }
+
+    @Test
+    fun sinConexion_muestraSoloElAviso() {
+        repositorio.respuesta = CompletableDeferred(ResultadoSesion.Fallido(ErrorSesion.SIN_CONEXION))
+        llenarFormulario()
+
+        viewModel.alPulsarEntrar()
+
+        assertEquals(R.string.error_sin_conexion, viewModel.estado.errorGeneral)
+        assertNull(viewModel.estado.errorContrasena)
     }
 
     @Test
@@ -115,19 +156,24 @@ class InicioSesionViewModelTest {
     }
 
     @Test
+    fun alEditarElCorreoTrasCredencialesIncorrectas_seBorranTodosLosErrores() {
+        repositorio.respuesta = CompletableDeferred(ResultadoSesion.Fallido(ErrorSesion.CREDENCIALES_INCORRECTAS))
+        llenarFormulario()
+        viewModel.alPulsarEntrar()
+
+        viewModel.alCambiarCorreo("otra@correo.com")
+
+        assertNull(viewModel.estado.errorGeneral)
+        assertNull(viewModel.estado.errorContrasena)
+    }
+
+    @Test
     fun alAlternarVisibilidad_muestraYOcultaLaContrasena() {
         viewModel.alAlternarVisibilidadContrasena()
         assertTrue(viewModel.estado.contrasenaVisible)
 
         viewModel.alAlternarVisibilidadContrasena()
         assertFalse(viewModel.estado.contrasenaVisible)
-    }
-
-    @Test
-    fun alCambiarRecordarme_guardaLaPreferencia() {
-        viewModel.alCambiarRecordarme(true)
-
-        assertTrue(viewModel.estado.recordarme)
     }
 
     private fun llenarFormulario() {

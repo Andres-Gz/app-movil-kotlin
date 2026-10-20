@@ -2,12 +2,12 @@
 
 Tu asistente financiero con IA. App Android hecha con Kotlin y Jetpack Compose.
 
-> **Estado:** en desarrollo. Por ahora tiene la pantalla de inicio de sesión, conectada a Supabase.
+> **Estado:** en desarrollo. Por ahora tiene las pantallas de inicio de sesión y de registro, conectadas a Supabase, los dos pasos de recuperar la contraseña y la bienvenida que aparece al iniciar sesión.
 
 ## Requisitos
 
 - [Android Studio](https://developer.android.com/studio) reciente. Trae su propio JDK, así que no hace falta instalar Java aparte.
-- Android SDK 37. Android Studio lo descarga al abrir el proyecto.
+- Android SDK 36. Android Studio lo descarga al abrir el proyecto.
 - Un emulador o un teléfono con Android 7.0 (API 24) o superior.
 
 ## Configuración
@@ -20,6 +20,22 @@ supabase.clave=sb_publishable_...
 ```
 
 Pide los valores al equipo. Usa solo la clave **publicable** (`sb_publishable_…`): la secreta nunca va en la app. Si falta alguna, Gradle no compila y te dice cuál.
+
+### Supabase (una sola vez por proyecto)
+
+Para que el registro, el inicio de sesión y la recuperación de contraseña funcionen, en el panel de Supabase:
+
+1. **SQL Editor → New query**, en este orden (cada archivo se pega y se pulsa **Run**; se pueden volver a correr sin problema):
+   - [`supabase/esquema.sql`](supabase/esquema.sql): crea las tablas, solo si el proyecto es nuevo.
+   - Si traes datos de otro proyecto: impórtalos desde CSV (**Table Editor → Insert → Import data from CSV**, empezando por `usuarios`, `colores` y `categorias`) y corre [`supabase/reajustar_contadores.sql`](supabase/reajustar_contadores.sql).
+   - [`supabase/configuracion_cuentas.sql`](supabase/configuracion_cuentas.sql): crea la fila de `usuarios` al registrarse, deja que cada usuario lea solo la suya y protege el resto de tablas.
+   - [`supabase/ingresos.sql`](supabase/ingresos.sql): crea la función `registrar_ingreso`, con la que la app guarda ingresos (en `movimientos`, sobre la cuenta principal del usuario, que crea si no existe).
+   - [`supabase/gastos.sql`](supabase/gastos.sql): crea la función `registrar_gasto`, que guarda el gasto con su categoría (la crea en `categorias` si el usuario no la tiene).
+   - [`supabase/inicio.sql`](supabase/inicio.sql): crea la función `resumen_inicio`, que junta en una llamada lo que muestra el dashboard.
+   - [`supabase/editar_movimientos.sql`](supabase/editar_movimientos.sql): crea `editar_movimiento` y `eliminar_movimiento`. Eliminar no borra la fila: la deja inactiva.
+   - [`supabase/metas.sql`](supabase/metas.sql): agrega a `metas` la categoría, el icono y la regla de aporte (columnas opcionales) y crea las funciones de metas: `resumen_metas` (las metas con lo ahorrado y las fechas de los aportes), `crear_meta`, `editar_meta`, `aportar_meta` (guarda el aporte en `aportes`, desde la cuenta principal), `ajustar_regla_meta` y `eliminar_meta` (no borra la fila: la deja inactiva).
+2. **Authentication → URL Configuration → Redirect URLs**: agrega `finanzia://recuperar`. Es la dirección del enlace del correo de recuperación, que abre la app en el paso 2.
+3. **Authentication → Sign In / Providers → Email → Confirm email**: si está activado, cada cuenta nueva debe confirmar su correo antes de entrar. El servicio de correo gratis de Supabase solo envía a los miembros del equipo del proyecto (y pocos correos por hora), así que para que cualquiera pueda registrarse hay que desactivarlo o configurar un SMTP propio en **Authentication → Emails → SMTP Settings**. Lo mismo aplica al correo de recuperación de contraseña.
 
 ## Cómo ejecutarla
 
@@ -53,22 +69,33 @@ finanzia/                               ← proyecto Android (esta es la carpeta
     │   │   │   └── Constantes.kt       ← constantes internas: tablas, mensajes de Logcat, patrones
     │   │   ├── tema/                   ← configuración visual
     │   │   │   ├── Colores.kt          ← la paleta de colores
-    │   │   │   ├── Tipografia.kt       ← la fuente, los 3 tamaños de letra y los estilos de texto
+    │   │   │   ├── Tipografia.kt       ← la fuente, los seis tamaños de letra y los estilos de texto
     │   │   │   ├── Dimensiones.kt      ← espacios, esquinas, alturas, tamaños y sombras
     │   │   │   ├── Iconos.kt           ← los iconos, cada uno con un nombre que dice para qué es
     │   │   │   └── TemaFinanzia.kt     ← junta todo lo anterior en el tema de la app
-    │   │   ├── componentes/            ← piezas reutilizables: campos, botones, barra superior…
+    │   │   ├── componentes/            ← piezas reutilizables: campos, botones, avisos, fondo…
     │   │   ├── datos/                  ← todo lo que habla con Supabase
     │   │   │   ├── ClienteSupabase.kt  ← la conexión única de la app
     │   │   │   ├── modelos/            ← las tablas mapeadas a data classes (p. ej. Usuario)
     │   │   │   └── repositorios/       ← acceso a los datos: una interfaz y su implementación
     │   │   ├── pantallas/
-    │   │   │   └── iniciosesion/       ← una carpeta por pantalla
-    │   │   │       ├── PantallaInicioSesion.kt
-    │   │   │       ├── EstadoInicioSesion.kt
-    │   │   │       ├── InicioSesionViewModel.kt
-    │   │   │       └── ValidadorInicioSesion.kt
-    │   │   └── utilidades/             ← funciones que se usan en varios lugares (p. ej. RegistroErrores.kt)
+    │   │   │   ├── iniciosesion/       ← una carpeta por pantalla
+    │   │   │   │   ├── PantallaInicioSesion.kt
+    │   │   │   │   ├── EstadoInicioSesion.kt
+    │   │   │   │   ├── InicioSesionViewModel.kt
+    │   │   │   │   └── ValidadorInicioSesion.kt
+    │   │   │   ├── registro/           ← misma forma: Pantalla, Estado, ViewModel y Validador
+    │   │   │   ├── recuperarcontrasena/  ← paso 1: verificar usuario y correo
+    │   │   │   ├── nuevacontrasena/      ← paso 2: escribir y confirmar la contraseña nueva
+    │   │   │   ├── bienvenida/           ← al iniciar sesión; solo muestra datos, así que no tiene ViewModel
+    │   │   │   ├── primerospasos/        ← tras "Comenzar ahora"; tampoco tiene ViewModel
+    │   │   │   ├── primeringreso/        ← monto y frecuencia del primer ingreso, guardado en Supabase
+    │   │   │   ├── primergasto/          ← monto y categoría del primer gasto, guardado en Supabase
+    │   │   │   ├── inicio/               ← el dashboard: balance, consejo, meta y últimos movimientos
+    │   │   │   ├── editarmovimiento/     ← editar o eliminar un movimiento (se abre al tocarlo en el inicio)
+    │   │   │   ├── metas/                ← ahorro, consejo de la IA, racha y cada meta; aportar, ajustar la regla y eliminar
+    │   │   │   └── nuevameta/            ← crear o editar una meta: nombre, categoría, monto, mes y frecuencia del aporte
+    │   │   └── utilidades/             ← funciones que se usan en varios lugares (p. ej. RegistroErrores.kt, Validaciones.kt)
     │   └── res/values/strings.xml      ← todos los textos de la app
     ├── test/                           ← pruebas unitarias (corren en el computador)
     └── androidTest/                    ← pruebas de pantalla (corren en el emulador)
@@ -87,7 +114,7 @@ La app se arma por capas, como piezas de construcción:
    - La lógica pura, como las validaciones, va en su propio archivo (`Validador<X>.kt`) para probarla sin emulador.
 4. **Datos (`datos/`)**: el ViewModel nunca habla directo con Supabase. Le pide los datos a un **repositorio**, que es una interfaz (`RepositorioSesion`) con su implementación (`RepositorioSesionSupabase`), y lo recibe por su constructor. Las tablas se mapean a `data class` en `modelos/`. En las pruebas se usa un repositorio falso, así no hace falta internet.
 
-Una pantalla no navega por su cuenta: avisa con callbacks (`alIniciarSesion`, `alRegistrarse`…) y `ActividadPrincipal` decide a dónde ir.
+Una pantalla no navega por su cuenta: avisa con callbacks (`alIniciarSesion`, `alRegistrarse`…) y `ActividadPrincipal` decide a dónde ir. Por ahora guarda en una variable qué pantalla se ve (con pocas pantallas no hace falta una librería de navegación).
 
 Si vienes de Spring Boot, la equivalencia es:
 
@@ -131,9 +158,22 @@ Text(
 )
 ```
 
-### 2. Solo tres tamaños de letra
+### 2. Las pantallas son copia del diseño
 
-`TamanoLetra.pequeno`, `mediano` y `grande`. Para destacar un texto se cambia el peso o el color; no se inventa un cuarto tamaño. Todo texto usa un estilo de `EstilosTexto`.
+Cada pantalla se construye igual a su diseño: textos, colores, medidas, iconos y estados de error. Los valores se miden sobre el diseño y se guardan en `tema/`.
+
+Los textos sí están normalizados: un mismo tipo de texto tiene el mismo tamaño en todas las pantallas, aunque un diseño traiga uno un poco distinto. Hay seis tamaños (`TamanoLetra`) y cada uno lleva siempre su alto de línea. Todo texto usa un estilo de `EstilosTexto`, nombrado por su función:
+
+| Tamaño | Para qué | Estilos |
+|---|---|---|
+| 24 | Logo | `logo`, `logoCompacto` |
+| 20 | Título de la pantalla | `titulo` |
+| 14 | Botones, lo que se escribe en los campos y títulos de avisos | `boton`, `botonSecundario`, `valorCampo`, `tituloAviso`… |
+| 13 | Descripción bajo el título y pie de la pantalla | `cuerpo`, `cuerpoDestacado` |
+| 12 | Eslogan, enlaces del formulario y avisos de error | `nota`, `notaFuerte` |
+| 11 | Etiquetas de campos, mensajes bajo los campos, requisitos y términos | `etiqueta`, `etiquetaExterna`, `ayuda`… |
+
+Para destacar un texto se cambia el peso o el color; no se inventa un tamaño nuevo.
 
 ### 3. Todo en español
 
@@ -174,11 +214,13 @@ En español, contando qué cambia y por qué. El asunto es corto y en presente, 
 ## Notas técnicas
 
 - Las dependencias se declaran solo en `gradle/libs.versions.toml`. Las de Compose van sin versión porque la fija el BOM.
-- El proyecto usa AGP 9, que ya trae soporte para Kotlin: **no** agregues el plugin `org.jetbrains.kotlin.android`.
-- Las reglas de R8 para la versión de lanzamiento van en `app/src/main/keepRules/`.
+- El proyecto usa AGP 8.13 con Gradle 8.14 para que abra también en las versiones de Android Studio de la universidad. Con AGP 8 el plugin `org.jetbrains.kotlin.android` sí es necesario.
+- La versión de lanzamiento todavía no se minifica (`isMinifyEnabled = false`).
 - Material 3 ya no incluye iconos: usamos `material-icons-extended`, siempre a través de `tema/Iconos.kt`.
 - Supabase se usa con [supabase-kt](https://github.com/supabase-community/supabase-kt) 3.2.6, la última versión compatible con nuestro Kotlin 2.2 (desde la 3.7 pide Kotlin 2.4).
 - El inicio de sesión lo hace Supabase Auth. La tabla `usuarios` solo aporta el perfil (se busca por correo) y la app nunca lee su columna `contrasena`.
+- El registro crea la cuenta en Supabase Auth y guarda el nombre como dato extra del usuario (`raw_user_meta_data`). La fila de `usuarios` la crea la base de datos con el disparador de `supabase/configuracion_cuentas.sql`; sin él, una cuenta nueva no puede iniciar sesión ("Tu cuenta no tiene un perfil registrado").
+- Recuperar la contraseña usa el flujo de Supabase Auth: el paso 1 pide el enlace al correo (`resetPasswordForEmail`) y el enlace `finanzia://recuperar` abre la app en el paso 2, que cambia la contraseña con la sesión temporal (`updateUser`). El nombre de usuario del paso 1 se pide pero no se compara con la base: hacerlo permitiría averiguar qué cuentas existen, y el correo ya prueba que la cuenta es de quien la pide.
 
 ## Problemas conocidos
 
