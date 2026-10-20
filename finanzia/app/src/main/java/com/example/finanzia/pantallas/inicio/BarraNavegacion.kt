@@ -31,7 +31,7 @@ import com.example.finanzia.tema.Iconos
 
 /** Barra de abajo: Inicio (la actual), Gráficos, Billetera, Metas y el botón "+". */
 @Composable
-internal fun BarraNavegacion(alAgregar: () -> Unit) {
+internal fun BarraNavegacion(alAgregar: () -> Unit, alAbrirMetas: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -41,10 +41,10 @@ internal fun BarraNavegacion(alAgregar: () -> Unit) {
         verticalAlignment = Alignment.CenterVertically,
     ) {
         ItemNavegacion(Iconos.navInicio, stringResource(R.string.inicio_nav_inicio), seleccionado = true)
-        // Gráficos, Billetera y Metas aún no tienen pantalla.
+        // Gráficos y Billetera aún no tienen pantalla.
         ItemNavegacion(Iconos.navGraficos, stringResource(R.string.inicio_nav_graficos), seleccionado = false)
         ItemNavegacion(Iconos.navBilletera, stringResource(R.string.inicio_nav_billetera), seleccionado = false)
-        ItemNavegacion(Iconos.navMetas, stringResource(R.string.inicio_nav_metas), seleccionado = false)
+        ItemNavegacion(Iconos.navMetas, stringResource(R.string.inicio_nav_metas), seleccionado = false, alPulsar = alAbrirMetas)
         Box(modifier = Modifier.weight(1f).fillMaxHeight(), contentAlignment = Alignment.Center) {
             Box(
                 modifier = Modifier
@@ -67,8 +67,9 @@ internal fun BarraNavegacion(alAgregar: () -> Unit) {
 }
 
 @Composable
-private fun RowScope.ItemNavegacion(icono: ImageVector, texto: String, seleccionado: Boolean) {
-    Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
+private fun RowScope.ItemNavegacion(icono: ImageVector, texto: String, seleccionado: Boolean, alPulsar: (() -> Unit)? = null) {
+    val pulsable = if (alPulsar != null) Modifier.clickable(role = Role.Button, onClick = alPulsar) else Modifier
+    Column(modifier = Modifier.weight(1f).then(pulsable), horizontalAlignment = Alignment.CenterHorizontally) {
         Box(
             modifier = Modifier
                 .size(Dimensiones.anchoSeleccionNavegacion, Dimensiones.altoSeleccionNavegacion)

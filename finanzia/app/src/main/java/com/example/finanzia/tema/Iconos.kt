@@ -5,7 +5,27 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.automirrored.outlined.ReceiptLong
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.automirrored.outlined.HelpOutline
 import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material.icons.filled.BeachAccess
+import androidx.compose.material.icons.filled.TwoWheeler
+import androidx.compose.material.icons.outlined.CalendarMonth
+import androidx.compose.material.icons.outlined.Cottage
+import androidx.compose.material.icons.outlined.DeleteOutline
+import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material.icons.outlined.EditCalendar
+import androidx.compose.material.icons.outlined.Flag
+import androidx.compose.material.icons.outlined.HighlightOff
+import androidx.compose.material.icons.outlined.Laptop
+import androidx.compose.material.icons.outlined.School
+import androidx.compose.material.icons.filled.Flag
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Savings
+import androidx.compose.material.icons.filled.Tune
+import androidx.compose.material.icons.outlined.AddCircleOutline
+import androidx.compose.material.icons.outlined.CalendarToday
+import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material.icons.outlined.AccountBalance
 import androidx.compose.material.icons.outlined.AccountBalanceWallet
 import androidx.compose.material.icons.outlined.BarChart
@@ -149,6 +169,32 @@ object Iconos {
     val navGraficos: ImageVector = Icons.Outlined.BarChart
     val navBilletera: ImageVector = Icons.Outlined.AccountBalanceWallet
     val navMetas: ImageVector = Icons.Outlined.TrackChanges
+
+    // Iconos de Material del diseño de metas.
+    val agregarCirculo: ImageVector = Icons.Outlined.AddCircleOutline
+    val alcancia: ImageVector = Icons.Filled.Savings
+    val bandera: ImageVector = Icons.Filled.Flag
+    val desplegar: ImageVector = Icons.Filled.KeyboardArrowDown
+    val masOpciones: ImageVector = Icons.Filled.MoreVert
+    val reloj: ImageVector = Icons.Outlined.Schedule
+    val calendario: ImageVector = Icons.Outlined.CalendarToday
+    val ajustarRegla: ImageVector = Icons.Filled.Tune
+
+    // Iconos de Material del diseño de nueva meta (el escudo de "Emergencia" es [escudo]).
+    val ayuda: ImageVector = Icons.AutoMirrored.Outlined.HelpOutline
+    val banderaContorno: ImageVector = Icons.Outlined.Flag
+    val borrarTexto: ImageVector = Icons.Outlined.HighlightOff
+    val playa: ImageVector = Icons.Filled.BeachAccess
+    val portatil: ImageVector = Icons.Outlined.Laptop
+    val moto: ImageVector = Icons.Filled.TwoWheeler
+    val casa: ImageVector = Icons.Outlined.Cottage
+    val estudio: ImageVector = Icons.Outlined.School
+    val calendarioMes: ImageVector = Icons.Outlined.CalendarMonth
+    val editarFecha: ImageVector = Icons.Outlined.EditCalendar
+
+    // Menú de cada meta (no está en el diseño).
+    val editar: ImageVector = Icons.Outlined.Edit
+    val eliminar: ImageVector = Icons.Outlined.DeleteOutline
 }
 
 /** Lado de la cuadrícula en la que se dibujan los iconos propios. */

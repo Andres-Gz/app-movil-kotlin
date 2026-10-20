@@ -25,6 +25,30 @@ object Constantes {
         /** Función que junta todo lo que muestra el inicio (supabase/inicio.sql). */
         const val FUNCION_RESUMEN_INICIO = "resumen_inicio"
 
+        /** Función que junta las metas y las fechas de sus aportes (supabase/metas.sql). */
+        const val FUNCION_RESUMEN_METAS = "resumen_metas"
+
+        /**
+         * Funciones que guardan las metas (supabase/metas.sql). Usan también p_id, p_monto, p_categoria
+         * y p_frecuencia, los mismos nombres que las de movimientos.
+         */
+        const val FUNCION_CREAR_META = "crear_meta"
+        const val FUNCION_EDITAR_META = "editar_meta"
+        const val FUNCION_APORTAR_META = "aportar_meta"
+        const val FUNCION_AJUSTAR_REGLA_META = "ajustar_regla_meta"
+        const val FUNCION_ELIMINAR_META = "eliminar_meta"
+        const val PARAMETRO_NOMBRE = "p_nombre"
+        const val PARAMETRO_FECHA_LIMITE = "p_fecha_limite"
+        const val PARAMETRO_MONTO_APORTE = "p_monto_aporte"
+
+        /** Nombres (en minúsculas) con que `crear_meta` guarda cada categoría, para volver a elegirla al editar. */
+        const val CATEGORIA_META_VIAJES = "viajes & ocio"
+        const val CATEGORIA_META_EMERGENCIA = "emergencia"
+        const val CATEGORIA_META_TECNOLOGIA = "tecnología"
+        const val CATEGORIA_META_VEHICULO = "vehículo"
+        const val CATEGORIA_META_VIVIENDA = "vivienda"
+        const val CATEGORIA_META_EDUCACION = "educación"
+
         /** Funciones que editan y eliminan un movimiento (supabase/editar_movimientos.sql). */
         const val FUNCION_EDITAR_MOVIMIENTO = "editar_movimiento"
         const val FUNCION_ELIMINAR_MOVIMIENTO = "eliminar_movimiento"
@@ -67,6 +91,32 @@ object Constantes {
 
         /** Cuántos círculos con iniciales se muestran junto al consejo. */
         const val INICIALES_VISIBLES = 3
+
+        /** Separador de miles de los montos de la pantalla de metas, que van en pesos (14850000 → 14.850.000). */
+        const val SEPARADOR_MILES_PESOS = '.'
+    }
+
+    /** Cuentas de la pantalla de metas: cuándo toca cada aporte y cuántas quincenas seguidas se ha aportado. */
+    object Metas {
+        /** La primera quincena se paga el 15; la segunda, el último día del mes. */
+        const val DIA_PRIMERA_QUINCENA = 15
+        const val QUINCENAS_POR_MES = 2
+        const val MESES_POR_ANO = 12
+        const val DIAS_POR_SEMANA = 7
+        const val MILISEGUNDOS_POR_DIA = 24L * 60 * 60 * 1000
+
+        /** Botones que suman al monto objetivo de una meta nueva ("+$500.000"…). */
+        val INCREMENTOS_MONTO = listOf(500_000L, 1_000_000L, 2_000_000L, 5_000_000L)
+        const val LARGO_MAXIMO_NOMBRE = 60
+
+        /** El aporte sugerido se redondea hacia arriba a miles de pesos (218.750 → 219.000). */
+        const val REDONDEO_APORTE = 1_000L
+
+        /** Cuántos años hacia adelante se puede elegir la fecha de una meta. */
+        const val ANOS_HACIA_ADELANTE = 10
+
+        /** Formato de la fecha límite que recibe `crear_meta`. */
+        const val PATRON_FECHA_LIMITE = "yyyy-MM-dd"
     }
 
     /** Reglas de validación de formularios. */

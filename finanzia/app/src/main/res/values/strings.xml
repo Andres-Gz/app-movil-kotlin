@@ -231,6 +231,162 @@
     <string name="inicio_nav_metas">Metas</string>
     <string name="error_inicio_no_cargado">No pudimos cargar tu resumen.</string>
 
+    <!-- Pantalla: metas (los saltos de línea son los del diseño) -->
+    <string name="metas_titulo">Metas Financieras</string>
+    <string name="metas_subtitulo">Tu copiloto IA proyectando tu futuro</string>
+    <string name="metas_nueva">+ Nueva Meta</string>
+    <string name="metas_ahorro_acumulado">Ahorro Acumulado en\nMetas</string>
+    <string name="metas_completado">%1$d%%\ncompletado</string>
+    <string name="metas_monto">$%1$s</string>
+    <string name="metas_de_objetivo">/ $%1$s COP</string>
+    <string name="metas_consejo_titulo">Consejo de Finanzia IA</string>
+    <string name="metas_consejo_alcanzaras">"A tu ritmo actual alcanzarás la meta "</string>
+    <string name="metas_consejo_nombre">“%1$s”</string>
+    <plurals name="metas_consejo_antes">
+        <item quantity="one">" %1$d día antes de lo previsto gracias al hábito %2$s."</item>
+        <item quantity="other">" %1$d días antes de lo previsto gracias al hábito %2$s."</item>
+    </plurals>
+    <string name="metas_consejo_a_tiempo">" justo a tiempo gracias al hábito %1$s."</string>
+    <string name="metas_consejo_la_meta">"A tu ritmo actual la meta "</string>
+    <plurals name="metas_consejo_tarde">
+        <item quantity="one">" llegaría %1$d día tarde. Sube un poco tu aporte %2$s para lograrla a tiempo."</item>
+        <item quantity="other">" llegaría %1$d días tarde. Sube un poco tu aporte %2$s para lograrla a tiempo."</item>
+    </plurals>
+    <string name="metas_consejo_sin_regla">Ponle fecha límite y una regla de aporte a tus metas y te diré cuándo las alcanzarás.</string>
+    <string name="metas_consejo_sin_metas">Crea tu primera meta y te diré cuándo la alcanzarás.</string>
+    <string name="metas_consejo_logradas">¡Lograste todas tus metas! Crea una nueva para seguir creciendo.</string>
+    <string name="metas_habito_diario">diario</string>
+    <string name="metas_habito_semanal">semanal</string>
+    <string name="metas_habito_quincenal">quincenal</string>
+    <string name="metas_habito_mensual">mensual</string>
+    <string name="metas_mascota">💵</string>
+    <string name="metas_racha_titulo">¡Vas con paso firme!</string>
+    <plurals name="metas_racha">
+        <item quantity="one">Llevas %1$d quincena cumpliendo tu plan automático.</item>
+        <item quantity="other">Llevas %1$d quincenas consecutivas cumpliendo tu plan automático.</item>
+    </plurals>
+    <string name="metas_racha_vacia_titulo">¡Empieza tu racha!</string>
+    <string name="metas_racha_vacia">Haz un aporte esta quincena y empieza a sumar quincenas seguidas.</string>
+    <string name="metas_activas">Metas Activas (%1$d)</string>
+    <string name="metas_ordenar">Ordenar</string>
+    <string name="metas_orden_fecha">Fecha límite</string>
+    <string name="metas_orden_avance">Mayor avance</string>
+    <string name="metas_orden_nombre">Nombre</string>
+    <string name="metas_sin_metas">Aún no tienes metas. Crea la primera con “+ Nueva Meta”.</string>
+    <string name="metas_icono_predeterminado">🎯</string>
+    <string name="metas_fecha_limite">%1$s %2$d</string>
+    <string-array name="metas_meses">
+        <item>Enero</item>
+        <item>Febrero</item>
+        <item>Marzo</item>
+        <item>Abril</item>
+        <item>Mayo</item>
+        <item>Junio</item>
+        <item>Julio</item>
+        <item>Agosto</item>
+        <item>Septiembre</item>
+        <item>Octubre</item>
+        <item>Noviembre</item>
+        <item>Diciembre</item>
+    </string-array>
+    <string name="metas_ahorrado">Ahorrado</string>
+    <string name="metas_meta">Meta</string>
+    <string name="metas_monto_cop">$%1$s COP</string>
+    <string name="metas_faltan">Faltan $%1$s COP</string>
+    <string name="metas_lograda">¡Meta lograda! 🎉</string>
+    <string name="metas_porcentaje">%1$d%%</string>
+    <string name="metas_proximo_aporte">"Próximo aporte: "</string>
+    <string name="metas_aporte_diario">" diario"</string>
+    <string name="metas_aporte_semanal">" semanal"</string>
+    <string name="metas_aporte_quincenal">" quincenal (15 y 30)"</string>
+    <string name="metas_aporte_mensual">" mensual (día 30)"</string>
+    <string name="metas_sin_regla">Aún no tienes una regla de aporte automático.</string>
+    <string name="metas_aportar">+ Aportar</string>
+    <string name="metas_ajustar_regla">Ajustar regla</string>
+    <string name="metas_editar">Editar meta</string>
+    <string name="metas_eliminar">Eliminar meta</string>
+    <string name="metas_cancelar">Cancelar</string>
+    <string name="metas_aportar_titulo">Aportar a “%1$s”</string>
+    <string name="metas_aportar_llevas">Llevas $%1$s de $%2$s COP</string>
+    <string name="metas_usar_regla">Tu regla: $%1$s</string>
+    <string name="metas_usar_falta">Lo que falta: $%1$s</string>
+    <string name="metas_aportar_boton">Aportar</string>
+    <string name="metas_regla_pregunta">¿Cuánto y cada cuánto quieres aportar a “%1$s”?</string>
+    <string name="metas_regla_sugerencia">Para lograrla en %1$s necesitas $%2$s COP %3$s.</string>
+    <string name="metas_cada_quincena">cada quincena</string>
+    <string name="metas_cada_mes">cada mes</string>
+    <string name="metas_usar_sugerido">Usar $%1$s</string>
+    <string name="metas_regla_guardar">Guardar</string>
+    <string name="metas_eliminar_titulo">¿Eliminar “%1$s”?</string>
+    <string name="metas_eliminar_mensaje">Dejará de aparecer en tus metas. Los aportes que hiciste no se borran.</string>
+    <string name="metas_eliminar_si">Eliminar</string>
+    <string name="metas_aviso_aporte">¡Listo! Registramos tu aporte.</string>
+    <string name="metas_aviso_lograda">¡Lograste tu meta! 🎉</string>
+    <string name="metas_aviso_regla">¡Listo! Ajustamos tu regla de aporte.</string>
+    <string name="metas_aviso_eliminada">Meta eliminada.</string>
+    <string name="metas_aviso_editada">¡Listo! Guardamos los cambios de tu meta.</string>
+    <string name="error_metas_no_cargadas">No pudimos cargar tus metas.</string>
+    <string name="error_meta_aporte_vacio">Escribe un monto mayor que cero</string>
+    <string name="error_meta_cambio_no_guardado">No pudimos guardar el cambio. Inténtalo de nuevo.</string>
+
+    <!-- Pantalla: nueva meta (paso 1) -->
+    <string name="nueva_meta_titulo">Nueva Meta</string>
+    <string name="nueva_meta_paso">Paso 1 de 2 • Configuración</string>
+    <string name="nueva_meta_titulo_editar">Editar Meta</string>
+    <string name="nueva_meta_paso_editar">Cambia lo que necesites</string>
+    <string name="nueva_meta_guardar_cambios">Guardar cambios</string>
+    <string name="nueva_meta_asistido">Asistido por Finanzia IA</string>
+    <string name="nueva_meta_optimizado">Optimizado COP</string>
+    <string name="nueva_meta_encabezado">Define tu objetivo financiero</string>
+    <string name="nueva_meta_descripcion">Establece tu meta y nuestro copiloto calculará el ritmo de ahorro perfecto según tus ingresos reales en Colombia.</string>
+    <string name="nueva_meta_etiqueta_nombre">Nombre de la meta</string>
+    <string name="nueva_meta_obligatorio">Obligatorio</string>
+    <string name="nueva_meta_ejemplo_nombre">Ej. Vacaciones en San Andrés</string>
+    <string name="nueva_meta_etiqueta_categoria">Categoría de la meta</string>
+    <plurals name="nueva_meta_disponibles">
+        <item quantity="one">%1$d disponible</item>
+        <item quantity="other">%1$d disponibles</item>
+    </plurals>
+    <string name="nueva_meta_categoria_viajes">Viajes &amp; Ocio</string>
+    <string name="nueva_meta_categoria_emergencia">Emergencia</string>
+    <string name="nueva_meta_categoria_tecnologia">Tecnología</string>
+    <string name="nueva_meta_categoria_vehiculo">Vehículo</string>
+    <string name="nueva_meta_categoria_vivienda">Vivienda</string>
+    <string name="nueva_meta_categoria_educacion">Educación</string>
+    <string name="nueva_meta_etiqueta_monto">Monto objetivo total</string>
+    <string name="nueva_meta_moneda">Moneda: COP ($)</string>
+    <string name="nueva_meta_signo">$</string>
+    <string name="nueva_meta_cop">COP</string>
+    <string name="nueva_meta_incremento">+$%1$s</string>
+    <string name="nueva_meta_etiqueta_fecha">Fecha estimada de logro</string>
+    <string name="nueva_meta_sin_fecha">Elige el mes</string>
+    <string name="nueva_meta_sin_fecha_detalle">Toca para elegir cuándo quieres lograrla</string>
+    <plurals name="nueva_meta_meses_restantes">
+        <item quantity="one">%1$d mes restante</item>
+        <item quantity="other">%1$d meses restantes</item>
+    </plurals>
+    <plurals name="nueva_meta_quincenas">
+        <item quantity="one">%1$d quincena</item>
+        <item quantity="other">%1$d quincenas</item>
+    </plurals>
+    <plurals name="nueva_meta_aportes_mensuales">
+        <item quantity="one">%1$d aporte mensual</item>
+        <item quantity="other">%1$d aportes mensuales</item>
+    </plurals>
+    <string name="nueva_meta_detalle_fecha">%1$s • %2$s</string>
+    <string name="nueva_meta_etiqueta_frecuencia">Frecuencia del aporte</string>
+    <string name="nueva_meta_quincenal">Quincenal (15 y 30)</string>
+    <string name="nueva_meta_mensual">Mensual (Día 30)</string>
+    <string name="nueva_meta_continuar">Continuar</string>
+    <string name="nueva_meta_guardada">¡Listo! Creamos tu meta.</string>
+    <string name="nueva_meta_selector_titulo">¿Para cuándo quieres lograrla?</string>
+    <string name="nueva_meta_selector_cancelar">Cancelar</string>
+    <string name="error_meta_nombre_vacio">Ponle un nombre a tu meta</string>
+    <string name="error_meta_monto_vacio">Escribe cuánto quieres ahorrar</string>
+    <string name="error_meta_fecha_vacia">Elige el mes en que quieres lograrla</string>
+    <string name="error_meta_fecha_pasada">Elige un mes a partir del próximo</string>
+    <string name="error_meta_no_guardada">No pudimos crear tu meta. Inténtalo de nuevo.</string>
+
     <!-- Pantalla: editar un movimiento -->
     <string name="editar_titulo_ingreso">Editar ingreso</string>
     <string name="editar_titulo_gasto">Editar gasto</string>
@@ -309,4 +465,10 @@
     <string name="accion_mostrar_montos">Mostrar montos</string>
     <string name="accion_ocultar_montos">Ocultar montos</string>
     <string name="accion_agregar_movimiento">Agregar movimiento</string>
+    <string name="accion_mas_opciones">Más opciones</string>
+    <string name="accion_ayuda">Ayuda</string>
+    <string name="accion_borrar_nombre">Borrar el nombre</string>
+    <string name="accion_elegir_fecha">Elegir la fecha</string>
+    <string name="accion_ano_anterior">Año anterior</string>
+    <string name="accion_ano_siguiente">Año siguiente</string>
 </resources>

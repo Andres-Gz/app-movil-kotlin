@@ -33,6 +33,7 @@ Para que el registro, el inicio de sesión y la recuperación de contraseña fun
    - [`supabase/gastos.sql`](supabase/gastos.sql): crea la función `registrar_gasto`, que guarda el gasto con su categoría (la crea en `categorias` si el usuario no la tiene).
    - [`supabase/inicio.sql`](supabase/inicio.sql): crea la función `resumen_inicio`, que junta en una llamada lo que muestra el dashboard.
    - [`supabase/editar_movimientos.sql`](supabase/editar_movimientos.sql): crea `editar_movimiento` y `eliminar_movimiento`. Eliminar no borra la fila: la deja inactiva.
+   - [`supabase/metas.sql`](supabase/metas.sql): agrega a `metas` la categoría, el icono y la regla de aporte (columnas opcionales) y crea las funciones de metas: `resumen_metas` (las metas con lo ahorrado y las fechas de los aportes), `crear_meta`, `editar_meta`, `aportar_meta` (guarda el aporte en `aportes`, desde la cuenta principal), `ajustar_regla_meta` y `eliminar_meta` (no borra la fila: la deja inactiva).
 2. **Authentication → URL Configuration → Redirect URLs**: agrega `finanzia://recuperar`. Es la dirección del enlace del correo de recuperación, que abre la app en el paso 2.
 3. **Authentication → Sign In / Providers → Email → Confirm email**: si está activado, cada cuenta nueva debe confirmar su correo antes de entrar. El servicio de correo gratis de Supabase solo envía a los miembros del equipo del proyecto (y pocos correos por hora), así que para que cualquiera pueda registrarse hay que desactivarlo o configurar un SMTP propio en **Authentication → Emails → SMTP Settings**. Lo mismo aplica al correo de recuperación de contraseña.
 
@@ -91,7 +92,9 @@ finanzia/                               ← proyecto Android (esta es la carpeta
     │   │   │   ├── primeringreso/        ← monto y frecuencia del primer ingreso, guardado en Supabase
     │   │   │   ├── primergasto/          ← monto y categoría del primer gasto, guardado en Supabase
     │   │   │   ├── inicio/               ← el dashboard: balance, consejo, meta y últimos movimientos
-    │   │   │   └── editarmovimiento/     ← editar o eliminar un movimiento (se abre al tocarlo en el inicio)
+    │   │   │   ├── editarmovimiento/     ← editar o eliminar un movimiento (se abre al tocarlo en el inicio)
+    │   │   │   ├── metas/                ← ahorro, consejo de la IA, racha y cada meta; aportar, ajustar la regla y eliminar
+    │   │   │   └── nuevameta/            ← crear o editar una meta: nombre, categoría, monto, mes y frecuencia del aporte
     │   │   └── utilidades/             ← funciones que se usan en varios lugares (p. ej. RegistroErrores.kt, Validaciones.kt)
     │   └── res/values/strings.xml      ← todos los textos de la app
     ├── test/                           ← pruebas unitarias (corren en el computador)

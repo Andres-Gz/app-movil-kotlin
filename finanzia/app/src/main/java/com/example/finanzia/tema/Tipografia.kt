@@ -90,6 +90,8 @@ object EstilosTexto {
 
     // 20: título de la pantalla
     val titulo = grande(FontWeight.Bold)
+    /** Títulos dentro de la pantalla, más suaves que el principal (p. ej. "Metas Activas" y el nombre de cada meta). */
+    val tituloSeccion = grande(FontWeight.SemiBold)
 
     // 14: botones, lo que se escribe en los campos y títulos de avisos
     val boton = normal(FontWeight.Bold)

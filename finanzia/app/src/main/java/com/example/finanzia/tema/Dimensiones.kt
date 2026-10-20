@@ -192,6 +192,85 @@ object Dimensiones {
     val anchoSeleccionNavegacion = 44.dp
     val altoSeleccionNavegacion = 28.dp
 
+    // Metas, de arriba hacia abajo (los márgenes de las tarjetas son margenPantallaAmplio)
+    val alturaEncabezadoMetas = 58.dp
+    val margenEncabezadoMetas = 30.dp
+    val alturaBotonNuevaMeta = 37.dp
+    val espacioEncabezadoMetas = 10.dp
+    val radioBrilloMentaAhorro = 150.dp
+    val radioBrilloLavandaAhorro = 190.dp
+    val elevacionTarjetaMetas = 3.dp
+    val rellenoTarjetaAhorro = 18.dp
+    val anchoRecuadroAlcancia = 24.dp
+    val altoRecuadroAlcancia = 30.dp
+    val rellenoHorizontalPildoraAvance = 10.dp
+    val tamanoCirculoConsejo = 26.dp
+    val espacioCirculoConsejo = 10.dp
+    val tamanoPuntoConsejo = 5.dp
+    val espacioAhorroRacha = 20.dp
+    val rellenoHorizontalRacha = 15.dp
+    val rellenoVerticalRacha = 10.dp
+    val tamanoMascota = 44.dp
+    val grosorBordeMascota = 2.dp
+    val tamanoInsigniaMascota = 16.dp
+    val tamanoMarcaInsignia = 10.dp
+    val espacioRachaLista = 20.dp
+    val espacioIconoTituloLista = 10.dp
+    val espacioOrdenarFlecha = 2.dp
+    val rellenoTarjetaMeta = 15.dp
+    val anchoRecuadroEmoji = 34.dp
+    val altoRecuadroEmoji = 40.dp
+    val espacioTituloEtiquetasMeta = 2.dp
+    val rellenoHorizontalEtiquetaMeta = 8.dp
+    val alturaEtiquetaMeta = 18.dp
+    val tamanoIconoFecha = 12.dp
+    val alturaBarraAvanceMeta = 6.dp
+    val espacioBarraAporte = 14.dp
+    val rellenoHorizontalAporte = 12.dp
+    val rellenoVerticalAporte = 7.dp
+    val radioAporte = 8.dp
+    val espacioAporteBotones = 18.dp
+    val alturaBotonMeta = 36.dp
+    val radioBotonMeta = 10.dp
+    val espacioIconoTextoBotonMeta = 6.dp
+    val espacioFinalMetas = 24.dp
+
+    // Nueva meta, de arriba hacia abajo (los márgenes son margenInicio)
+    val tamanoBotonEncabezadoMeta = 36.dp
+    val espacioEncabezadoObjetivo = 8.dp
+    val rellenoTarjetaObjetivo = 14.dp
+    val alturaPildoraObjetivo = 22.dp
+    val espacioEntrePildorasObjetivo = 6.dp
+    val espacioPildorasTitulo = 8.dp
+    val espacioTituloDescripcionObjetivo = 4.dp
+    val espacioEntreSeccionesMeta = 18.dp
+    val espacioEtiquetaSeccionMeta = 6.dp
+    val alturaCampoNombreMeta = 56.dp
+    val rellenoCampoNombreMeta = 12.dp
+    val tamanoRecuadroBandera = 34.dp
+    val radioRecuadroBandera = 10.dp
+    val alturaCategoriaMeta = 62.dp
+    val espacioEntreCategoriasMeta = 10.dp
+    val tamanoIconoCategoriaMeta = 22.dp
+    val espacioIconoTextoCategoriaMeta = 6.dp
+    val rellenoHorizontalPildoraMoneda = 8.dp
+    val rellenoVerticalPildoraMoneda = 1.dp
+    val espacioEtiquetaMontoMeta = 8.dp
+    val espacioSignoMonto = 8.dp
+    val espacioMontoIncrementos = 14.dp
+    val alturaIncremento = 26.dp
+    val rellenoHorizontalIncremento = 12.dp
+    val alturaCampoFechaMeta = 54.dp
+    val rellenoHorizontalCampoFecha = 14.dp
+    val espacioFechaFrecuencia = 14.dp
+    val alturaSelectorFrecuencia = 40.dp
+    val rellenoSelectorFrecuencia = 4.dp
+    val alturaMesSelector = 40.dp
+
+    // Ventanas de aportar y ajustar la regla (no están en el diseño)
+    val alturaCampoMontoDialogo = 52.dp
+    val rellenoHorizontalCampoMontoDialogo = 14.dp
+
     // Barra superior fija (nueva contraseña)
     val alturaBarraSuperior = 60.dp
     val rellenoInicioBarra = 24.dp
@@ -334,6 +413,7 @@ object Dimensiones {
     // Bordes y sombras
     val grosorBorde = 1.dp
     val grosorIndicadorCarga = 2.dp
+    val elevacionNula = 0.dp
     val elevacionCampo = 1.dp
     val elevacionBoton = 6.dp
 }

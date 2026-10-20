@@ -17,11 +17,14 @@ import androidx.compose.ui.graphics.toArgb
 import com.example.finanzia.configuracion.Constantes
 import com.example.finanzia.datos.ClienteSupabase
 import com.example.finanzia.pantallas.bienvenida.PantallaBienvenida
+import com.example.finanzia.datos.modelos.Meta
 import com.example.finanzia.datos.modelos.MovimientoReciente
 import com.example.finanzia.pantallas.editarmovimiento.PantallaEditarMovimiento
 import com.example.finanzia.pantallas.editarmovimiento.ResultadoEdicion
 import com.example.finanzia.pantallas.inicio.PantallaInicio
 import com.example.finanzia.pantallas.iniciosesion.PantallaInicioSesion
+import com.example.finanzia.pantallas.metas.PantallaMetas
+import com.example.finanzia.pantallas.nuevameta.PantallaNuevaMeta
 import com.example.finanzia.pantallas.nuevacontrasena.PantallaNuevaContrasena
 import com.example.finanzia.pantallas.primergasto.PantallaPrimerGasto
 import com.example.finanzia.pantallas.primeringreso.PantallaPrimerIngreso
@@ -34,7 +37,7 @@ import io.github.jan.supabase.auth.handleDeeplinks
 import kotlinx.serialization.json.Json
 
 /** Las pantallas a las que se puede ir. */
-private enum class Destino { INICIO_SESION, REGISTRO, RECUPERAR_CONTRASENA, NUEVA_CONTRASENA, BIENVENIDA, PRIMEROS_PASOS, PRIMER_INGRESO, PRIMER_GASTO, INICIO, EDITAR_MOVIMIENTO }
+private enum class Destino { INICIO_SESION, REGISTRO, RECUPERAR_CONTRASENA, NUEVA_CONTRASENA, BIENVENIDA, PRIMEROS_PASOS, PRIMER_INGRESO, PRIMER_GASTO, INICIO, EDITAR_MOVIMIENTO, METAS, NUEVA_META, EDITAR_META }
 
 /** Lo que trajo el enlace del correo de recuperación. */
 private enum class EnlaceRecuperacion { VALIDO, VENCIDO }
@@ -59,6 +62,14 @@ class ActividadPrincipal : ComponentActivity() {
                 var correoSesion by rememberSaveable { mutableStateOf("") }
                 // Movimiento que se está editando, en JSON para que sobreviva al girar la pantalla.
                 var movimientoEditado by rememberSaveable { mutableStateOf<String?>(null) }
+                // Meta que se está editando, en JSON igual que el movimiento.
+                var metaEditada by rememberSaveable { mutableStateOf<String?>(null) }
+                // Desde dónde se abrieron las metas (la bienvenida o el inicio), para volver ahí.
+                var origenMetas by rememberSaveable { mutableStateOf(Destino.INICIO) }
+                val abrirMetasDesde = { origen: Destino ->
+                    origenMetas = origen
+                    destino = Destino.METAS
+                }
                 val volverAlInicio = { destino = Destino.INICIO_SESION }
                 val enlace = enlaceRecibido
                 LaunchedEffect(enlace) {
@@ -72,8 +83,8 @@ class ActividadPrincipal : ComponentActivity() {
                     }
                     enlaceRecibido = null
                 }
-                // El botón Atrás del teléfono: del paso 2 vuelve al paso 1, de primeros pasos a la bienvenida
-                // y de las demás al inicio de sesión.
+                // El botón Atrás del teléfono: del paso 2 vuelve al paso 1, de primeros pasos a la bienvenida,
+                // de las metas a donde se abrieron, de crear o editar una meta a las metas y de las demás al inicio de sesión.
                 // En el inicio (dashboard), Atrás cierra la app como siempre.
                 BackHandler(enabled = destino != Destino.INICIO_SESION && destino != Destino.INICIO) {
                     destino = when (destino) {
@@ -81,6 +92,8 @@ class ActividadPrincipal : ComponentActivity() {
                         Destino.PRIMEROS_PASOS -> Destino.BIENVENIDA
                         Destino.PRIMER_INGRESO, Destino.PRIMER_GASTO -> Destino.PRIMEROS_PASOS
                         Destino.EDITAR_MOVIMIENTO -> Destino.INICIO
+                        Destino.METAS -> origenMetas
+                        Destino.NUEVA_META, Destino.EDITAR_META -> Destino.METAS
                         else -> Destino.INICIO_SESION
                     }
                 }
@@ -124,8 +137,7 @@ class ActividadPrincipal : ComponentActivity() {
                     Destino.BIENVENIDA -> PantallaBienvenida(
                         correo = correoSesion,
                         alComenzar = { destino = Destino.PRIMEROS_PASOS },
-                        // Aún no existe la pantalla de metas.
-                        alPersonalizarMetas = {},
+                        alPersonalizarMetas = { abrirMetasDesde(Destino.BIENVENIDA) },
                     )
                     Destino.PRIMEROS_PASOS -> PantallaPrimerosPasos(
                         alRegistrarIngreso = { destino = Destino.PRIMER_INGRESO },
@@ -156,7 +168,42 @@ class ActividadPrincipal : ComponentActivity() {
                             movimientoEditado = Json.encodeToString(movimiento)
                             destino = Destino.EDITAR_MOVIMIENTO
                         },
+                        alAbrirMetas = { abrirMetasDesde(Destino.INICIO) },
                     )
+                    Destino.METAS -> PantallaMetas(
+                        alVolver = { destino = origenMetas },
+                        alNuevaMeta = { destino = Destino.NUEVA_META },
+                        alEditarMeta = { meta ->
+                            metaEditada = Json.encodeToString(meta)
+                            destino = Destino.EDITAR_META
+                        },
+                        alAvisar = { mensaje -> mostrarMensaje(getString(mensaje)) },
+                    )
+                    // Mientras no exista el paso 2, la meta se guarda al pulsar "Continuar" en el paso 1.
+                    Destino.NUEVA_META -> PantallaNuevaMeta(
+                        meta = null,
+                        alVolver = { destino = Destino.METAS },
+                        alMetaGuardada = {
+                            mostrarMensaje(getString(R.string.nueva_meta_guardada))
+                            destino = Destino.METAS
+                        },
+                    )
+                    Destino.EDITAR_META -> {
+                        val meta = metaEditada?.let { Json.decodeFromString<Meta>(it) }
+                        if (meta == null) {
+                            LaunchedEffect(Unit) { destino = Destino.METAS }
+                        } else {
+                            PantallaNuevaMeta(
+                                meta = meta,
+                                alVolver = { destino = Destino.METAS },
+                                alMetaGuardada = {
+                                    mostrarMensaje(getString(R.string.metas_aviso_editada))
+                                    metaEditada = null
+                                    destino = Destino.METAS
+                                },
+                            )
+                        }
+                    }
                     Destino.EDITAR_MOVIMIENTO -> {
                         val movimiento = movimientoEditado?.let { Json.decodeFromString<MovimientoReciente>(it) }
                         if (movimiento == null) {

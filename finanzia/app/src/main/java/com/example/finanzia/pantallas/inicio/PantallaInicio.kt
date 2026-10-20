@@ -55,6 +55,7 @@ import kotlin.math.abs
 fun PantallaInicio(
     alAgregar: () -> Unit,
     alEditarMovimiento: (MovimientoReciente) -> Unit,
+    alAbrirMetas: () -> Unit,
     viewModel: InicioViewModel = viewModel { InicioViewModel(RepositorioInicioSupabase()) },
 ) {
     LaunchedEffect(Unit) { viewModel.cargar() }
@@ -64,6 +65,7 @@ fun PantallaInicio(
         alReintentar = viewModel::cargar,
         alAgregar = alAgregar,
         alEditarMovimiento = alEditarMovimiento,
+        alAbrirMetas = alAbrirMetas,
     )
 }
 
@@ -75,6 +77,7 @@ private fun ContenidoInicio(
     alReintentar: () -> Unit,
     alAgregar: () -> Unit,
     alEditarMovimiento: (MovimientoReciente) -> Unit,
+    alAbrirMetas: () -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -122,7 +125,7 @@ private fun ContenidoInicio(
                 Spacer(Modifier.height(Dimensiones.espacioEntreSecciones))
             }
         }
-        BarraNavegacion(alAgregar = alAgregar)
+        BarraNavegacion(alAgregar = alAgregar, alAbrirMetas = alAbrirMetas)
     }
 }
 
@@ -238,6 +241,7 @@ private fun VistaPreviaInicio() {
             alReintentar = {},
             alAgregar = {},
             alEditarMovimiento = {},
+            alAbrirMetas = {},
         )
     }
 }

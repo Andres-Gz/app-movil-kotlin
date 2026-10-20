@@ -122,6 +122,15 @@ object Colores {
     val degradadoBalance = listOf(azulMarca, azulIntenso, verdeSeguro)
     val degradadoConversar = listOf(verdeSeguro, azulMarca)
 
+    // Metas: brillo menta arriba a la derecha de la tarjeta del ahorro, barras y tarjeta de la racha
+    val azulBruma = Color(0xFFD3E4FE)
+    val celesteMascota = Color(0xFFDEF3FE)
+    val brilloMentaAhorro = arrayOf(0f to verdeMenta.copy(alpha = 0.32f), 1f to verdeMenta.copy(alpha = 0f))
+    val brilloLavandaAhorro = arrayOf(0f to rellenoCampo, 1f to rellenoCampo.copy(alpha = 0f))
+    val degradadoAhorroTotal = listOf(verdeSeguro, azulMarca)
+    val degradadoAvanceMeta = listOf(verdeSeguro, azulIntenso)
+    val degradadoRacha = listOf(azulBotonClaro, rellenoCampo)
+
     // Fondo del registro: brillo lavanda abajo a la izquierda y menta abajo a la derecha
     private val lavanda = Color(0xFFEEF3FD)
     private val menta = Color(0xFFC7F3E3)
