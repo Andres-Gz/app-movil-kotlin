@@ -466,6 +466,7 @@
     <string name="accion_ocultar_montos">Ocultar montos</string>
     <string name="accion_agregar_movimiento">Agregar movimiento</string>
     <string name="accion_mas_opciones">Más opciones</string>
+    <string name="accion_logo">Finanzia, tu asistente financiero con IA</string>
     <string name="accion_ayuda">Ayuda</string>
     <string name="accion_borrar_nombre">Borrar el nombre</string>
     <string name="accion_elegir_fecha">Elegir la fecha</string>

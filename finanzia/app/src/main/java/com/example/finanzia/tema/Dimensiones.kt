@@ -12,7 +12,6 @@ object Dimensiones {
     val margenPantalla = 24.dp
 
     // Espacios del inicio de sesión, de arriba hacia abajo
-    val espacioLogoEslogan = 2.dp
     val espacioEsloganSaludo = 13.dp
     val espacioSaludoDescripcion = 1.dp
     val espacioDescripcionFormulario = 16.dp
@@ -386,10 +385,8 @@ object Dimensiones {
     val tamanoBotonVolver = 40.dp
     val tamanoBotonVolverConFondo = 44.dp
 
-    // Logo del inicio de sesión: el destello se corre a la derecha y arriba desde la esquina del nombre
-    val tamanoDestello = 12.dp
-    val desplazamientoDestelloX = 12.5.dp
-    val desplazamientoDestelloY = (-3).dp
+    // Logo del inicio de sesión: la imagen (trae el nombre y el eslogan)
+    val anchoLogoInicioSesion = 220.dp
 
     // Logo compacto (registro): el destello va al lado del nombre
     val tamanoDestelloCompacto = 10.dp

@@ -166,7 +166,7 @@ Los textos sí están normalizados: un mismo tipo de texto tiene el mismo tamañ
 
 | Tamaño | Para qué | Estilos |
 |---|---|---|
-| 24 | Logo | `logo`, `logoCompacto` |
+| 24 | Logo de texto (el inicio de sesión usa la imagen `logo_finanzia`) | `logoCompacto` |
 | 20 | Título de la pantalla | `titulo` |
 | 14 | Botones, lo que se escribe en los campos y títulos de avisos | `boton`, `botonSecundario`, `valorCampo`, `tituloAviso`… |
 | 13 | Descripción bajo el título y pie de la pantalla | `cuerpo`, `cuerpoDestacado` |

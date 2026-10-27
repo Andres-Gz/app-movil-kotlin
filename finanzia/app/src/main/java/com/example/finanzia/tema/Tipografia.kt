@@ -40,7 +40,6 @@ private object Interlineado {
 
 /** Separación extra (o menos separación) entre letras. */
 private object Espaciado {
-    val logo = 0.06.em
     val logoCompacto = (-0.025).em
     val etiqueta = 0.05.em
     val etiquetaExterna = 0.07.em
@@ -81,8 +80,7 @@ private fun pequeno(peso: FontWeight, espaciado: TextUnit = TextUnit.Unspecified
  * (por ejemplo, el pie "¿No tienes cuenta?" y "¿Ya tienes una cuenta?" usan [cuerpo] y [cuerpoDestacado]).
  */
 object EstilosTexto {
-    // 24: logo (cada pantalla tiene su versión del logo)
-    val logo = enorme(FontWeight.ExtraBold, Espaciado.logo)
+    // 24: logo de texto (el inicio de sesión usa la imagen del logo)
     val logoCompacto = enorme(FontWeight.ExtraBold, Espaciado.logoCompacto)
 
     // 24: montos de dinero que se escriben en grande

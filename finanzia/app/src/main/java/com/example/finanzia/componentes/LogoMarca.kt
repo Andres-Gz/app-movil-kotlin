@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -23,30 +22,6 @@ import com.example.finanzia.tema.Colores
 import com.example.finanzia.tema.Dimensiones
 import com.example.finanzia.tema.EstilosTexto
 import com.example.finanzia.tema.Iconos
-
-/**
- * Logo del inicio de sesión: el nombre de la app en mayúsculas con un destello verde arriba a la derecha.
- * El destello no ocupa espacio, así el nombre queda centrado igual que en el diseño.
- */
-@Composable
-fun LogoMarca(modifier: Modifier = Modifier) {
-    Box(modifier = modifier) {
-        Text(
-            text = stringResource(R.string.nombre_app).uppercase(),
-            style = EstilosTexto.logo,
-            color = Colores.azulNoche,
-        )
-        Icon(
-            imageVector = Iconos.destello,
-            contentDescription = null,
-            tint = Colores.verdeDestello,
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .offset(x = Dimensiones.desplazamientoDestelloX, y = Dimensiones.desplazamientoDestelloY)
-                .size(Dimensiones.tamanoDestello),
-        )
-    }
-}
 
 /** Logo de recuperar contraseña: el nombre con letras juntas y un punto verde al lado, centrado en conjunto. */
 @Composable

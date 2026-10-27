@@ -12,7 +12,6 @@ object Colores {
     val verdeOscuro = Color(0xFF059669)
     val verdeDestello = Color(0xFF34D399)
     val azulMarca = Color(0xFF2563EB)
-    val azulNoche = Color(0xFF0A192F)
     val azulProfundo = Color(0xFF0D1B3D)
 
     // Fondos, superficies y bordes
