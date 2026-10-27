@@ -16,6 +16,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.toArgb
 import com.example.finanzia.configuracion.Constantes
 import com.example.finanzia.datos.ClienteSupabase
+import com.example.finanzia.pantallas.asistente.PantallaAsistente
 import com.example.finanzia.pantallas.bienvenida.PantallaBienvenida
 import com.example.finanzia.datos.modelos.Meta
 import com.example.finanzia.datos.modelos.MovimientoReciente
@@ -37,7 +38,7 @@ import io.github.jan.supabase.auth.handleDeeplinks
 import kotlinx.serialization.json.Json
 
 /** Las pantallas a las que se puede ir. */
-private enum class Destino { INICIO_SESION, REGISTRO, RECUPERAR_CONTRASENA, NUEVA_CONTRASENA, BIENVENIDA, PRIMEROS_PASOS, PRIMER_INGRESO, PRIMER_GASTO, INICIO, EDITAR_MOVIMIENTO, METAS, NUEVA_META, EDITAR_META }
+private enum class Destino { INICIO_SESION, REGISTRO, RECUPERAR_CONTRASENA, NUEVA_CONTRASENA, BIENVENIDA, PRIMEROS_PASOS, PRIMER_INGRESO, PRIMER_GASTO, INICIO, EDITAR_MOVIMIENTO, METAS, NUEVA_META, EDITAR_META, ASISTENTE }
 
 /** Lo que trajo el enlace del correo de recuperación. */
 private enum class EnlaceRecuperacion { VALIDO, VENCIDO }
@@ -84,14 +85,15 @@ class ActividadPrincipal : ComponentActivity() {
                     enlaceRecibido = null
                 }
                 // El botón Atrás del teléfono: del paso 2 vuelve al paso 1, de primeros pasos a la bienvenida,
-                // de las metas a donde se abrieron, de crear o editar una meta a las metas y de las demás al inicio de sesión.
+                // de las metas a donde se abrieron, de crear o editar una meta a las metas, del asistente al inicio
+                // y de las demás al inicio de sesión.
                 // En el inicio (dashboard), Atrás cierra la app como siempre.
                 BackHandler(enabled = destino != Destino.INICIO_SESION && destino != Destino.INICIO) {
                     destino = when (destino) {
                         Destino.NUEVA_CONTRASENA -> Destino.RECUPERAR_CONTRASENA
                         Destino.PRIMEROS_PASOS -> Destino.BIENVENIDA
                         Destino.PRIMER_INGRESO, Destino.PRIMER_GASTO -> Destino.PRIMEROS_PASOS
-                        Destino.EDITAR_MOVIMIENTO -> Destino.INICIO
+                        Destino.EDITAR_MOVIMIENTO, Destino.ASISTENTE -> Destino.INICIO
                         Destino.METAS -> origenMetas
                         Destino.NUEVA_META, Destino.EDITAR_META -> Destino.METAS
                         else -> Destino.INICIO_SESION
@@ -169,6 +171,13 @@ class ActividadPrincipal : ComponentActivity() {
                             destino = Destino.EDITAR_MOVIMIENTO
                         },
                         alAbrirMetas = { abrirMetasDesde(Destino.INICIO) },
+                        alAbrirAsistente = { destino = Destino.ASISTENTE },
+                    )
+                    Destino.ASISTENTE -> PantallaAsistente(
+                        alVolver = { destino = Destino.INICIO },
+                        alAbrirInicio = { destino = Destino.INICIO },
+                        alAbrirMetas = { abrirMetasDesde(Destino.ASISTENTE) },
+                        alAvisar = { mensaje -> mostrarMensaje(getString(mensaje)) },
                     )
                     Destino.METAS -> PantallaMetas(
                         alVolver = { destino = origenMetas },

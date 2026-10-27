@@ -58,6 +58,15 @@ object Constantes {
         /** Cómo se llama el tipo de movimiento de los ingresos en `movimientos.tipo`. */
         const val TIPO_INGRESO = "ingreso"
 
+        /** Funciones del chat con Finanzia IA (supabase/asistente.sql). Eliminar usa p_id. */
+        const val FUNCION_CONVERSACIONES_ASISTENTE = "conversaciones_asistente"
+        const val FUNCION_MENSAJES_ASISTENTE = "mensajes_asistente"
+        const val FUNCION_CONFIRMAR_ACCION = "confirmar_accion_asistente"
+        const val FUNCION_CANCELAR_ACCION = "cancelar_accion_asistente"
+        const val FUNCION_ELIMINAR_CONVERSACION = "eliminar_conversacion_asistente"
+        const val PARAMETRO_CONVERSACION = "p_conversacion"
+        const val PARAMETRO_MENSAJE = "p_mensaje"
+
         /** Nombres (en minúsculas) de las categorías que crea `registrar_gasto`, para elegir su icono. */
         const val CATEGORIA_FIJOS = "gastos fijos"
         const val CATEGORIA_COMIDA = "comida"
@@ -117,6 +126,34 @@ object Constantes {
 
         /** Formato de la fecha límite que recibe `crear_meta`. */
         const val PATRON_FECHA_LIMITE = "yyyy-MM-dd"
+    }
+
+    /** El chat con Finanzia IA. */
+    object Asistente {
+        /** La Edge Function que habla con la IA (supabase/functions/asistente) y lo que recibe. */
+        const val FUNCION = "asistente"
+        const val CAMPO_CONVERSACION = "id_conversacion"
+        const val CAMPO_MENSAJE = "mensaje"
+
+        /** Cuánto se espera la respuesta: la IA puede consultar los datos varias veces antes de contestar. */
+        const val ESPERA_MAXIMA_MILISEGUNDOS = 120_000L
+
+        /** El mismo límite que revisa la Edge Function. */
+        const val LARGO_MAXIMO_PREGUNTA = 2000
+
+        /** La IA empieza cada respuesta con "# Título" y resalta las cifras con **negrita**. */
+        const val MARCA_TITULO = "# "
+        const val MARCA_NEGRITA = "**"
+
+        /** Cuántas líneas crece el campo de la pregunta antes de desplazarse. */
+        const val LINEAS_CAMPO = 4
+
+        /** Idioma del dictado por voz. */
+        const val IDIOMA_DICTADO = "es-CO"
+
+        const val MILISEGUNDOS_POR_MINUTO = 60_000L
+        const val MINUTOS_POR_HORA = 60L
+        const val HORAS_POR_DIA = 24L
     }
 
     /** Reglas de validación de formularios. */

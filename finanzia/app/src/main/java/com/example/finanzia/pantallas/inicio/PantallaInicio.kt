@@ -9,31 +9,27 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.finanzia.R
 import com.example.finanzia.componentes.AvisoError
+import com.example.finanzia.componentes.BarraNavegacion
+import com.example.finanzia.componentes.BarraSuperiorApp
 import com.example.finanzia.componentes.BotonDegradado
 import com.example.finanzia.componentes.OrigenError
 import com.example.finanzia.componentes.Pildora
+import com.example.finanzia.componentes.SeccionNavegacion
 import com.example.finanzia.componentes.TextoEnlace
 import com.example.finanzia.configuracion.Constantes
 import com.example.finanzia.datos.modelos.MovimientoReciente
@@ -56,6 +52,7 @@ fun PantallaInicio(
     alAgregar: () -> Unit,
     alEditarMovimiento: (MovimientoReciente) -> Unit,
     alAbrirMetas: () -> Unit,
+    alAbrirAsistente: () -> Unit,
     viewModel: InicioViewModel = viewModel { InicioViewModel(RepositorioInicioSupabase()) },
 ) {
     LaunchedEffect(Unit) { viewModel.cargar() }
@@ -66,6 +63,7 @@ fun PantallaInicio(
         alAgregar = alAgregar,
         alEditarMovimiento = alEditarMovimiento,
         alAbrirMetas = alAbrirMetas,
+        alAbrirAsistente = alAbrirAsistente,
     )
 }
 
@@ -78,6 +76,7 @@ private fun ContenidoInicio(
     alAgregar: () -> Unit,
     alEditarMovimiento: (MovimientoReciente) -> Unit,
     alAbrirMetas: () -> Unit,
+    alAbrirAsistente: () -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -86,7 +85,7 @@ private fun ContenidoInicio(
             .statusBarsPadding()
             .navigationBarsPadding(),
     ) {
-        BarraSuperiorInicio()
+        BarraSuperiorApp()
         Column(
             modifier = Modifier
                 .weight(1f)
@@ -114,8 +113,7 @@ private fun ContenidoInicio(
                 Spacer(Modifier.height(Dimensiones.espacioEntreSecciones))
                 BotonDegradado(
                     texto = stringResource(R.string.inicio_conversar),
-                    // Aún no existe el chat con Finanzia IA.
-                    alPulsar = {},
+                    alPulsar = alAbrirAsistente,
                     iconoInicial = Iconos.conversar,
                     iconoFinal = Iconos.adelante,
                     radio = Dimensiones.radioBotonCompacto,
@@ -125,63 +123,7 @@ private fun ContenidoInicio(
                 Spacer(Modifier.height(Dimensiones.espacioEntreSecciones))
             }
         }
-        BarraNavegacion(alAgregar = alAgregar, alAbrirMetas = alAbrirMetas)
-    }
-}
-
-/** Logo con "Finanzia / Copiloto IA", la campana y el perfil. */
-@Composable
-private fun BarraSuperiorInicio() {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(Dimensiones.alturaBarraInicio)
-            .padding(horizontal = Dimensiones.margenInicio),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Box(
-            modifier = Modifier
-                .size(Dimensiones.tamanoLogoApp)
-                .background(Brush.linearGradient(Colores.degradadoBotonFrio), RoundedCornerShape(Dimensiones.radioLogoApp)),
-            contentAlignment = Alignment.Center,
-        ) {
-            Icon(Iconos.asistente, null, tint = Colores.textoSobreColor, modifier = Modifier.size(Dimensiones.tamanoIcono))
-        }
-        Spacer(Modifier.width(Dimensiones.espacioPequeno))
-        Column(modifier = Modifier.weight(1f)) {
-            Text(text = stringResource(R.string.nombre_app), style = EstilosTexto.tituloAviso, color = Colores.tinta)
-            Text(text = stringResource(R.string.inicio_copiloto), style = EstilosTexto.ayudaFuerte, color = Colores.verdeSeguro)
-        }
-        // Las notificaciones y el perfil aún no tienen pantalla.
-        Box(modifier = Modifier.size(Dimensiones.tamanoBotonVolver), contentAlignment = Alignment.Center) {
-            Icon(
-                imageVector = Iconos.notificaciones,
-                contentDescription = stringResource(R.string.accion_notificaciones),
-                tint = Colores.tinta,
-                modifier = Modifier.size(Dimensiones.tamanoIcono),
-            )
-            Box(
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .offset(x = Dimensiones.espacioPuntoEstado, y = -Dimensiones.espacioPuntoEstado)
-                    .size(Dimensiones.tamanoPuntoAviso)
-                    .background(Colores.azulMarca, CircleShape),
-            )
-        }
-        Spacer(Modifier.width(Dimensiones.espacioPequeno))
-        Box(
-            modifier = Modifier
-                .size(Dimensiones.tamanoBotonIcono)
-                .background(Colores.azulIntenso, CircleShape),
-            contentAlignment = Alignment.Center,
-        ) {
-            Icon(
-                imageVector = Iconos.persona,
-                contentDescription = stringResource(R.string.accion_perfil),
-                tint = Colores.textoSobreColor,
-                modifier = Modifier.size(Dimensiones.tamanoIconoCompacto),
-            )
-        }
+        BarraNavegacion(seleccionada = SeccionNavegacion.INICIO, alAbrirMetas = alAbrirMetas, alAgregar = alAgregar)
     }
 }
 
@@ -242,6 +184,7 @@ private fun VistaPreviaInicio() {
             alAgregar = {},
             alEditarMovimiento = {},
             alAbrirMetas = {},
+            alAbrirAsistente = {},
         )
     }
 }

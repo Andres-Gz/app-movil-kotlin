@@ -1,4 +1,4 @@
-package com.example.finanzia.pantallas.inicio
+package com.example.finanzia.componentes
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -29,9 +29,20 @@ import com.example.finanzia.tema.Dimensiones
 import com.example.finanzia.tema.EstilosTexto
 import com.example.finanzia.tema.Iconos
 
-/** Barra de abajo: Inicio (la actual), Gráficos, Billetera, Metas y el botón "+". */
+/** Las secciones de la barra de abajo que tienen pantalla. */
+enum class SeccionNavegacion { INICIO, METAS, ASISTENTE }
+
+/**
+ * Barra de abajo: Inicio, Gráficos, Billetera, Metas y, al final, el botón "+" si hay [alAgregar]
+ * (en el inicio) o "Asistente" (en el chat). [seleccionada] va resaltada.
+ */
 @Composable
-internal fun BarraNavegacion(alAgregar: () -> Unit, alAbrirMetas: () -> Unit) {
+fun BarraNavegacion(
+    seleccionada: SeccionNavegacion,
+    alAbrirInicio: () -> Unit = {},
+    alAbrirMetas: () -> Unit = {},
+    alAgregar: (() -> Unit)? = null,
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -40,35 +51,45 @@ internal fun BarraNavegacion(alAgregar: () -> Unit, alAbrirMetas: () -> Unit) {
             .padding(horizontal = Dimensiones.espacioPequeno),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        ItemNavegacion(Iconos.navInicio, stringResource(R.string.inicio_nav_inicio), seleccionado = true)
+        ItemNavegacion(Iconos.navInicio, stringResource(R.string.inicio_nav_inicio), seleccionada == SeccionNavegacion.INICIO, alAbrirInicio)
         // Gráficos y Billetera aún no tienen pantalla.
         ItemNavegacion(Iconos.navGraficos, stringResource(R.string.inicio_nav_graficos), seleccionado = false)
         ItemNavegacion(Iconos.navBilletera, stringResource(R.string.inicio_nav_billetera), seleccionado = false)
-        ItemNavegacion(Iconos.navMetas, stringResource(R.string.inicio_nav_metas), seleccionado = false, alPulsar = alAbrirMetas)
-        Box(modifier = Modifier.weight(1f).fillMaxHeight(), contentAlignment = Alignment.Center) {
-            Box(
-                modifier = Modifier
-                    .size(Dimensiones.tamanoBotonAgregar)
-                    .shadow(Dimensiones.elevacionBoton, CircleShape, ambientColor = Colores.azulIntenso, spotColor = Colores.azulIntenso)
-                    .background(Brush.linearGradient(listOf(Colores.azulIntenso, Colores.verdeSeguro)), CircleShape)
-                    .clip(CircleShape)
-                    .clickable(role = Role.Button, onClick = alAgregar),
-                contentAlignment = Alignment.Center,
-            ) {
-                Icon(
-                    imageVector = Iconos.agregar,
-                    contentDescription = stringResource(R.string.accion_agregar_movimiento),
-                    tint = Colores.textoSobreColor,
-                    modifier = Modifier.size(Dimensiones.tamanoIconoGrande),
-                )
-            }
+        ItemNavegacion(Iconos.navMetas, stringResource(R.string.inicio_nav_metas), seleccionada == SeccionNavegacion.METAS, alAbrirMetas)
+        if (alAgregar != null) {
+            BotonAgregar(alAgregar)
+        } else {
+            ItemNavegacion(Iconos.navAsistente, stringResource(R.string.inicio_nav_asistente), seleccionada == SeccionNavegacion.ASISTENTE)
         }
     }
 }
 
 @Composable
+private fun RowScope.BotonAgregar(alAgregar: () -> Unit) {
+    Box(modifier = Modifier.weight(1f).fillMaxHeight(), contentAlignment = Alignment.Center) {
+        Box(
+            modifier = Modifier
+                .size(Dimensiones.tamanoBotonAgregar)
+                .shadow(Dimensiones.elevacionBoton, CircleShape, ambientColor = Colores.azulIntenso, spotColor = Colores.azulIntenso)
+                .background(Brush.linearGradient(listOf(Colores.azulIntenso, Colores.verdeSeguro)), CircleShape)
+                .clip(CircleShape)
+                .clickable(role = Role.Button, onClick = alAgregar),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(
+                imageVector = Iconos.agregar,
+                contentDescription = stringResource(R.string.accion_agregar_movimiento),
+                tint = Colores.textoSobreColor,
+                modifier = Modifier.size(Dimensiones.tamanoIconoGrande),
+            )
+        }
+    }
+}
+
+/** Una sección. La seleccionada no responde al pulsarla: ya se está ahí. */
+@Composable
 private fun RowScope.ItemNavegacion(icono: ImageVector, texto: String, seleccionado: Boolean, alPulsar: (() -> Unit)? = null) {
-    val pulsable = if (alPulsar != null) Modifier.clickable(role = Role.Button, onClick = alPulsar) else Modifier
+    val pulsable = if (alPulsar != null && !seleccionado) Modifier.clickable(role = Role.Button, onClick = alPulsar) else Modifier
     Column(modifier = Modifier.weight(1f).then(pulsable), horizontalAlignment = Alignment.CenterHorizontally) {
         Box(
             modifier = Modifier

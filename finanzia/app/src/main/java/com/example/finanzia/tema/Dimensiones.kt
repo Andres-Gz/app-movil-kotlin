@@ -266,6 +266,25 @@ object Dimensiones {
     val rellenoSelectorFrecuencia = 4.dp
     val alturaMesSelector = 40.dp
 
+    // Asistente, de arriba hacia abajo (los márgenes son margenPantallaAmplio)
+    val alturaEncabezadoAsistente = 56.dp
+    val tamanoAvatarEncabezado = 40.dp
+    val tamanoPuntoActivo = 10.dp
+    val grosorBordePuntoActivo = 2.dp
+    val espacioAvatarNombre = 10.dp
+    val tamanoInsigniaNombre = 18.dp
+    val alturaSugerencia = 36.dp
+    val rellenoHorizontalChipAsistente = 14.dp
+    val espacioEntreMensajes = 16.dp
+    val sangriaBurbuja = 44.dp
+    val rellenoHorizontalBurbuja = 16.dp
+    val rellenoVerticalBurbuja = 12.dp
+    val tamanoAvatarMensaje = 32.dp
+    val rellenoTarjetaRespuesta = 16.dp
+    val tamanoBotonEscritura = 36.dp
+    val rellenoBarraEscritura = 8.dp
+    val espacioBarraNavegacion = 12.dp
+
     // Ventanas de aportar y ajustar la regla (no están en el diseño)
     val alturaCampoMontoDialogo = 52.dp
     val rellenoHorizontalCampoMontoDialogo = 14.dp

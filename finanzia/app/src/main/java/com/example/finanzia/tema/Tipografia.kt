@@ -97,6 +97,9 @@ object EstilosTexto {
     val tituloAviso = normal(FontWeight.Bold)
     val valorCampo = normal(FontWeight.Medium)
     val ejemploCampo = normal(FontWeight.Normal)
+    /** Lo que se dice en el chat con Finanzia IA; las cifras que resalta la IA van en [mensajeDestacado]. */
+    val mensaje = normal(FontWeight.Normal)
+    val mensajeDestacado = normal(FontWeight.Bold)
     val contrasenaOculta = valorCampo.copy(letterSpacing = Espaciado.contrasenaOculta)
 
     // 13: descripción bajo el título y pie de la pantalla

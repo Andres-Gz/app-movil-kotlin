@@ -84,6 +84,8 @@ object Colores {
     val errorProfundo = Color(0xFF93000A)
     val errorProfundoSuave = errorProfundo.copy(alpha = 0.8f)
     val degradadoBotonFrio = listOf(verdeSeguro, azulIntenso)
+    /** El botón de enviar del asistente cuando no hay nada que mandar. */
+    val degradadoBotonFrioApagado = degradadoBotonFrio.map { it.copy(alpha = 0.5f) }
 
     // Bienvenida: la misma paleta fría, con unos tonos más para la lista y sus insignias
     val fondoLista = Color(0xFFF5F8FF)

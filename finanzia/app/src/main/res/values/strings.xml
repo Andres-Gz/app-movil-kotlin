@@ -229,6 +229,7 @@
     <string name="inicio_nav_graficos">Gráficos</string>
     <string name="inicio_nav_billetera">Billetera</string>
     <string name="inicio_nav_metas">Metas</string>
+    <string name="inicio_nav_asistente">Asistente</string>
     <string name="error_inicio_no_cargado">No pudimos cargar tu resumen.</string>
 
     <!-- Pantalla: metas (los saltos de línea son los del diseño) -->
@@ -407,6 +408,54 @@
     <string name="error_descripcion_vacia">Escribe una descripción</string>
     <string name="error_movimiento_no_guardado">No pudimos guardar los cambios. Inténtalo de nuevo.</string>
 
+    <!-- Pantalla: asistente (el chat con Finanzia IA) -->
+    <string name="asistente_estado">Copiloto Activo</string>
+    <string name="asistente_sugerencia_gastar">¿Cuánto puedo gastar esta semana?</string>
+    <string name="asistente_sugerencia_proyeccion">Proyección de este mes</string>
+    <string name="asistente_sugerencia_metas">¿Cómo voy con mis metas?</string>
+    <string name="asistente_sugerencia_gasto">Registrar un gasto</string>
+    <string name="asistente_sugerencia_cenar">¿Puedo cenar fuera hoy?</string>
+    <string name="asistente_entregado">%1$s • Entregado</string>
+    <string name="asistente_enviando">Enviando…</string>
+    <string name="asistente_pensando">Revisando tus datos…</string>
+    <string name="asistente_bienvenida_titulo">Hola, soy Finanzia IA</string>
+    <string name="asistente_bienvenida">Pregúntame cuánto puedes gastar, cómo van tus metas o en qué se te va la plata. También puedo registrar un gasto, un ingreso o un aporte: tú lo confirmas antes de que se guarde.</string>
+    <string name="asistente_ahora">Ahora</string>
+    <string name="asistente_hace_minutos">Hace %1$d min</string>
+    <string name="asistente_hace_horas">Hace %1$d h</string>
+    <plurals name="asistente_hace_dias">
+        <item quantity="one">Hace %1$d día</item>
+        <item quantity="other">Hace %1$d días</item>
+    </plurals>
+    <string name="asistente_escribe">Escribe tu pregunta…</string>
+    <string name="asistente_atajo_gasto">Registrar un gasto</string>
+    <string name="asistente_atajo_gasto_texto">"Registra un gasto de "</string>
+    <string name="asistente_atajo_ingreso">Registrar un ingreso</string>
+    <string name="asistente_atajo_ingreso_texto">"Registra un ingreso de "</string>
+    <string name="asistente_atajo_aporte">Aportar a una meta</string>
+    <string name="asistente_atajo_aporte_texto">"Aporta a mi meta "</string>
+    <string name="asistente_accion_gasto">Registrar gasto</string>
+    <string name="asistente_accion_ingreso">Registrar ingreso</string>
+    <string name="asistente_accion_aporte">Aportar a tu meta</string>
+    <string name="asistente_monto">$%1$s</string>
+    <string name="asistente_detalle">%1$s · %2$s</string>
+    <string name="asistente_confirmar">Confirmar</string>
+    <string name="asistente_cancelar">Cancelar</string>
+    <string name="asistente_accion_confirmada">Guardado</string>
+    <string name="asistente_accion_cancelada">Cancelado</string>
+    <string name="asistente_aviso_guardado">¡Listo! Quedó guardado.</string>
+    <string name="asistente_aviso_eliminada">Eliminaste la conversación</string>
+    <string name="asistente_menu_nueva">Nueva conversación</string>
+    <string name="asistente_menu_eliminar">Eliminar conversación</string>
+    <string name="asistente_eliminar_titulo">¿Eliminar esta conversación?</string>
+    <string name="asistente_eliminar_texto">Ya no aparecerá en tu historial. Lo que hayas guardado desde el chat no se borra.</string>
+    <string name="asistente_eliminar_confirmar">Eliminar</string>
+    <string name="asistente_historial_titulo">Tus conversaciones</string>
+    <string name="asistente_historial_vacio">Todavía no tienes conversaciones.</string>
+    <string name="asistente_historial_sin_titulo">Conversación</string>
+    <string name="asistente_sin_dictado">Tu teléfono no tiene dictado por voz</string>
+    <string name="asistente_dictado_indicacion">¿Qué le quieres preguntar a Finanzia IA?</string>
+
     <!-- Errores de validación (los saltos de línea de los avisos son los del diseño) -->
     <string name="error_campos_incompletos">Por favor completa todos los campos para\ncontinuar</string>
     <string name="error_nombre_vacio">El nombre es requerido</string>
@@ -450,6 +499,12 @@
     <string name="error_ingreso_no_guardado">No pudimos guardar tu ingreso. Inténtalo de nuevo.</string>
     <string name="error_gasto_no_guardado">No pudimos guardar tu gasto. Inténtalo de nuevo.</string>
 
+    <!-- Errores del asistente -->
+    <string name="error_asistente_sin_respuesta">Finanzia IA no pudo responder. Inténtalo de nuevo.</string>
+    <string name="error_asistente_accion">No pudimos guardar el cambio. Inténtalo de nuevo.</string>
+    <string name="error_asistente_eliminar">No pudimos eliminar la conversación. Inténtalo de nuevo.</string>
+    <string name="error_asistente_historial">No pudimos cargar tus conversaciones. Inténtalo de nuevo.</string>
+
     <!-- Errores de conexión -->
     <string name="error_sin_conexion">No hay conexión. Revisa tu internet e inténtalo de nuevo</string>
     <string name="error_desconocido">Algo salió mal. Inténtalo de nuevo</string>
@@ -472,4 +527,8 @@
     <string name="accion_elegir_fecha">Elegir la fecha</string>
     <string name="accion_ano_anterior">Año anterior</string>
     <string name="accion_ano_siguiente">Año siguiente</string>
+    <string name="accion_historial">Historial de conversaciones</string>
+    <string name="accion_atajos">Atajos</string>
+    <string name="accion_dictar">Dictar por voz</string>
+    <string name="accion_enviar">Enviar</string>
 </resources>
