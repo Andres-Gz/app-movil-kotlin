@@ -1,5 +1,6 @@
 package com.example.finanzia.pantallas.iniciosesion
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -22,6 +23,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -33,7 +35,6 @@ import com.example.finanzia.componentes.BotonDegradado
 import com.example.finanzia.componentes.CampoContrasena
 import com.example.finanzia.componentes.CampoTexto
 import com.example.finanzia.componentes.FondoConOlas
-import com.example.finanzia.componentes.LogoMarca
 import com.example.finanzia.componentes.OrigenError
 import com.example.finanzia.componentes.TextoEnlace
 import com.example.finanzia.datos.modelos.Usuario
@@ -175,16 +176,14 @@ private fun Formulario(
     }
 }
 
-/** Logo, eslogan, saludo y descripción. */
+/** Logo (la imagen ya trae el nombre y el eslogan), saludo y descripción. */
 @Composable
 private fun SeccionBienvenida() {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        LogoMarca()
-        Spacer(Modifier.height(Dimensiones.espacioLogoEslogan))
-        Text(
-            text = stringResource(R.string.eslogan_app),
-            style = EstilosTexto.nota,
-            color = Colores.verdeMarca,
+        Image(
+            painter = painterResource(R.drawable.logo_finanzia),
+            contentDescription = stringResource(R.string.accion_logo),
+            modifier = Modifier.width(Dimensiones.anchoLogoInicioSesion),
         )
         Spacer(Modifier.height(Dimensiones.espacioEsloganSaludo))
         Text(

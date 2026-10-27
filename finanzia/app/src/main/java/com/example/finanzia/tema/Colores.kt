@@ -12,7 +12,6 @@ object Colores {
     val verdeOscuro = Color(0xFF059669)
     val verdeDestello = Color(0xFF34D399)
     val azulMarca = Color(0xFF2563EB)
-    val azulNoche = Color(0xFF0A192F)
     val azulProfundo = Color(0xFF0D1B3D)
 
     // Fondos, superficies y bordes
@@ -85,6 +84,8 @@ object Colores {
     val errorProfundo = Color(0xFF93000A)
     val errorProfundoSuave = errorProfundo.copy(alpha = 0.8f)
     val degradadoBotonFrio = listOf(verdeSeguro, azulIntenso)
+    /** El botón de enviar del asistente cuando no hay nada que mandar. */
+    val degradadoBotonFrioApagado = degradadoBotonFrio.map { it.copy(alpha = 0.5f) }
 
     // Bienvenida: la misma paleta fría, con unos tonos más para la lista y sus insignias
     val fondoLista = Color(0xFFF5F8FF)

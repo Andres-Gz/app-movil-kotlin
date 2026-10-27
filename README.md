@@ -2,7 +2,7 @@
 
 Tu asistente financiero con IA. App Android hecha con Kotlin y Jetpack Compose.
 
-> **Estado:** en desarrollo. Por ahora tiene las pantallas de inicio de sesión y de registro, conectadas a Supabase, los dos pasos de recuperar la contraseña y la bienvenida que aparece al iniciar sesión.
+> **Estado:** en desarrollo. Tiene inicio de sesión, registro y recuperación de contraseña (con Supabase), la bienvenida y los primeros pasos, el inicio con los movimientos (que se pueden editar), las metas de ahorro y el chat con Finanzia IA.
 
 ## Requisitos
 
@@ -34,8 +34,19 @@ Para que el registro, el inicio de sesión y la recuperación de contraseña fun
    - [`supabase/inicio.sql`](supabase/inicio.sql): crea la función `resumen_inicio`, que junta en una llamada lo que muestra el dashboard.
    - [`supabase/editar_movimientos.sql`](supabase/editar_movimientos.sql): crea `editar_movimiento` y `eliminar_movimiento`. Eliminar no borra la fila: la deja inactiva.
    - [`supabase/metas.sql`](supabase/metas.sql): agrega a `metas` la categoría, el icono y la regla de aporte (columnas opcionales) y crea las funciones de metas: `resumen_metas` (las metas con lo ahorrado y las fechas de los aportes), `crear_meta`, `editar_meta`, `aportar_meta` (guarda el aporte en `aportes`, desde la cuenta principal), `ajustar_regla_meta` y `eliminar_meta` (no borra la fila: la deja inactiva).
+   - [`supabase/asistente.sql`](supabase/asistente.sql): agrega a `mensajes` la acción que propone la IA y su estado, y crea las funciones del chat: listar conversaciones, leer sus mensajes, guardar cada pregunta con su respuesta, eliminar una conversación, confirmar o cancelar lo que propuso la IA y `movimientos_asistente` (los movimientos de un periodo, que consulta la IA). Va después de los anteriores porque confirmar usa `registrar_gasto`, `registrar_ingreso` y `aportar_meta`.
 2. **Authentication → URL Configuration → Redirect URLs**: agrega `finanzia://recuperar`. Es la dirección del enlace del correo de recuperación, que abre la app en el paso 2.
 3. **Authentication → Sign In / Providers → Email → Confirm email**: si está activado, cada cuenta nueva debe confirmar su correo antes de entrar. El servicio de correo gratis de Supabase solo envía a los miembros del equipo del proyecto (y pocos correos por hora), así que para que cualquiera pueda registrarse hay que desactivarlo o configurar un SMTP propio en **Authentication → Emails → SMTP Settings**. Lo mismo aplica al correo de recuperación de contraseña.
+4. **El asistente (Finanzia IA)**. La IA es Claude, de Anthropic, y la app no le habla directo: lo hace la Edge Function [`supabase/functions/asistente`](supabase/functions/asistente), que guarda la llave de la API. Para activarlo:
+   1. Crea una llave en [console.anthropic.com](https://console.anthropic.com) (**API Keys → Create Key**). La API se paga por uso, así que hay que cargar saldo en **Billing**.
+   2. En Supabase, **Edge Functions → Secrets**: agrega `ANTHROPIC_API_KEY` con esa llave. Nunca la pongas en el código ni en `local.properties`.
+   3. Despliega la función desde la carpeta raíz del repositorio (necesita Node.js; no hace falta Docker). `<ref>` es lo que va antes de `.supabase.co` en la URL del proyecto:
+      ```bash
+      npx supabase login
+      npx supabase functions deploy asistente --project-ref <ref> --no-verify-jwt --use-api
+      ```
+      `--no-verify-jwt` deja que la función revise la sesión ella misma (así funciona también con las claves publicables nuevas); sin una sesión válida responde 401 y no llama a la IA.
+   4. Si el chat responde "Finanzia IA no pudo responder", el motivo queda en **Edge Functions → asistente → Logs** (por ejemplo, que falta el secreto o que la llave no tiene saldo).
 
 ## Cómo ejecutarla
 
@@ -59,6 +70,8 @@ Si la terminal no encuentra Java, usa el JDK que trae Android Studio. En Windows
 ## Organización de los archivos
 
 ```
+supabase/                               ← los SQL que se corren en Supabase y la Edge Function del asistente
+└── functions/asistente/                ← habla con la IA: index.ts (la petición), conversacion.ts (memoria) y herramientas.ts
 finanzia/                               ← proyecto Android (esta es la carpeta que se abre en Android Studio)
 ├── gradle/libs.versions.toml           ← versiones de todas las dependencias
 └── app/src/
@@ -94,7 +107,8 @@ finanzia/                               ← proyecto Android (esta es la carpeta
     │   │   │   ├── inicio/               ← el dashboard: balance, consejo, meta y últimos movimientos
     │   │   │   ├── editarmovimiento/     ← editar o eliminar un movimiento (se abre al tocarlo en el inicio)
     │   │   │   ├── metas/                ← ahorro, consejo de la IA, racha y cada meta; aportar, ajustar la regla y eliminar
-    │   │   │   └── nuevameta/            ← crear o editar una meta: nombre, categoría, monto, mes y frecuencia del aporte
+    │   │   │   ├── nuevameta/            ← crear o editar una meta: nombre, categoría, monto, mes y frecuencia del aporte
+    │   │   │   └── asistente/            ← el chat con Finanzia IA: mensajes, propuestas para confirmar e historial
     │   │   └── utilidades/             ← funciones que se usan en varios lugares (p. ej. RegistroErrores.kt, Validaciones.kt)
     │   └── res/values/strings.xml      ← todos los textos de la app
     ├── test/                           ← pruebas unitarias (corren en el computador)
@@ -166,7 +180,7 @@ Los textos sí están normalizados: un mismo tipo de texto tiene el mismo tamañ
 
 | Tamaño | Para qué | Estilos |
 |---|---|---|
-| 24 | Logo | `logo`, `logoCompacto` |
+| 24 | Logo de texto (el inicio de sesión usa la imagen `logo_finanzia`) | `logoCompacto` |
 | 20 | Título de la pantalla | `titulo` |
 | 14 | Botones, lo que se escribe en los campos y títulos de avisos | `boton`, `botonSecundario`, `valorCampo`, `tituloAviso`… |
 | 13 | Descripción bajo el título y pie de la pantalla | `cuerpo`, `cuerpoDestacado` |
@@ -221,6 +235,15 @@ En español, contando qué cambia y por qué. El asunto es corto y en presente, 
 - El inicio de sesión lo hace Supabase Auth. La tabla `usuarios` solo aporta el perfil (se busca por correo) y la app nunca lee su columna `contrasena`.
 - El registro crea la cuenta en Supabase Auth y guarda el nombre como dato extra del usuario (`raw_user_meta_data`). La fila de `usuarios` la crea la base de datos con el disparador de `supabase/configuracion_cuentas.sql`; sin él, una cuenta nueva no puede iniciar sesión ("Tu cuenta no tiene un perfil registrado").
 - Recuperar la contraseña usa el flujo de Supabase Auth: el paso 1 pide el enlace al correo (`resetPasswordForEmail`) y el enlace `finanzia://recuperar` abre la app en el paso 2, que cambia la contraseña con la sesión temporal (`updateUser`). El nombre de usuario del paso 1 se pide pero no se compara con la base: hacerlo permitiría averiguar qué cuentas existen, y el correo ya prueba que la cuenta es de quien la pide.
+
+## El asistente (Finanzia IA)
+
+- **Por qué hay un servidor en medio.** La app llama a la Edge Function `asistente` con el token de la sesión, y la función llama a Claude. Si la app llamara directo a la IA, la llave de la API quedaría dentro del APK y cualquiera podría sacarla.
+- **Memoria.** El modelo no recuerda nada entre una pregunta y otra. Cada pregunta y su respuesta se guardan en `conversaciones` y `mensajes`, y en cada pregunta nueva la función le vuelve a mandar los últimos 40 mensajes. Por eso, si arriba le dijiste "70", en el siguiente mensaje lo sabe.
+- **Acceso a los datos.** La IA no escribe SQL ni toca la base. Tiene herramientas (`consultar_resumen`, `consultar_movimientos`, `consultar_metas`) que la función ejecuta con las mismas funciones SQL de la app y con el token del usuario, así que solo ve los datos de quien pregunta.
+- **Registrar desde el chat.** Con `proponer_gasto`, `proponer_ingreso` y `proponer_aporte` la IA solo propone: la respuesta trae una tarjeta con Confirmar y Cancelar, y se guarda únicamente si el usuario confirma (`confirmar_accion_asistente`, que usa `registrar_gasto`, `registrar_ingreso` y `aportar_meta`).
+- **Modelo.** Claude Opus 5.5 (`claude-opus-5-5`), con esfuerzo `medium`; se cambian en `conversacion.ts`. Si los filtros de seguridad rechazan una pregunta, la API la reintenta sola con otro modelo (`fallbacks: "default"`) y, si igual la rechaza, la app muestra una respuesta amable.
+- **Pruebas de la función** (sin llamar a la IA), desde la raíz del repositorio y con [Deno](https://deno.com): `deno test supabase/functions/asistente`.
 
 ## Problemas conocidos
 

@@ -6,3 +6,6 @@
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# Lo que crea la CLI de Supabase al desplegar (proyecto enlazado y versión)
+supabase/.temp/

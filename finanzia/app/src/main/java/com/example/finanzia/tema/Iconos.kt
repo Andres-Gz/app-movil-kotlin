@@ -16,6 +16,11 @@ import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.EditCalendar
 import androidx.compose.material.icons.outlined.Flag
 import androidx.compose.material.icons.outlined.HighlightOff
+import androidx.compose.material.icons.outlined.History
+import androidx.compose.material.icons.outlined.Lightbulb
+import androidx.compose.material.icons.outlined.Mic
+import androidx.compose.material.icons.outlined.Savings
+import androidx.compose.material.icons.outlined.Verified
 import androidx.compose.material.icons.outlined.Laptop
 import androidx.compose.material.icons.outlined.School
 import androidx.compose.material.icons.filled.Flag
@@ -195,6 +200,15 @@ object Iconos {
     // Menú de cada meta (no está en el diseño).
     val editar: ImageVector = Icons.Outlined.Edit
     val eliminar: ImageVector = Icons.Outlined.DeleteOutline
+
+    // Asistente (Finanzia IA)
+    val navAsistente: ImageVector = robot
+    val insigniaVerificada: ImageVector = Icons.Outlined.Verified
+    val historial: ImageVector = Icons.Outlined.History
+    val idea: ImageVector = Icons.Outlined.Lightbulb
+    val alcanciaContorno: ImageVector = Icons.Outlined.Savings
+    val microfono: ImageVector = Icons.Outlined.Mic
+    val enviar: ImageVector = salida
 }
 
 /** Lado de la cuadrícula en la que se dibujan los iconos propios. */
