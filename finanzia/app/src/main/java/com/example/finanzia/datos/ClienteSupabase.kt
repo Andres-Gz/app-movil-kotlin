@@ -5,6 +5,7 @@ import com.example.finanzia.configuracion.Constantes
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.createSupabaseClient
+import io.github.jan.supabase.functions.Functions
 import io.github.jan.supabase.postgrest.Postgrest
 
 /**
@@ -23,6 +24,8 @@ object ClienteSupabase {
                 host = Constantes.Enlaces.HOST_RECUPERACION
             }
             install(Postgrest)
+            // Para llamar a las Edge Functions (el asistente).
+            install(Functions)
         }
     }
 }

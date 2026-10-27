@@ -82,6 +82,7 @@ object Constantes {
         const val RECHAZO_RECUPERACION = "Supabase Auth rechazó la recuperación de contraseña"
         const val SIN_CONEXION = "No hubo conexión con Supabase"
         const val ERROR_SERVIDOR = "Supabase respondió con un error"
+        const val RESPUESTA_INESPERADA = "Supabase respondió algo que la app no entiende"
     }
 
     /** Formatos de montos y fechas. */

@@ -7,6 +7,7 @@ import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.RestException
+import kotlinx.serialization.SerializationException
 
 /** Lo que devuelve [llamarConSesion]: el valor pedido o por qué no se pudo. */
 sealed interface Llamada<out T> {
@@ -27,6 +28,10 @@ internal suspend fun <T> llamarConSesion(cliente: SupabaseClient, accion: suspen
         Llamada.Fallida(ErrorDatos.SIN_CONEXION)
     } catch (error: RestException) {
         registrarAdvertencia(Constantes.Registro.ERROR_SERVIDOR, error.resumen())
+        Llamada.Fallida(ErrorDatos.DESCONOCIDO)
+    } catch (error: SerializationException) {
+        // La respuesta llegó, pero no tiene la forma que espera la app: se avisa en vez de cerrar la app.
+        registrarAdvertencia(Constantes.Registro.RESPUESTA_INESPERADA, error.message)
         Llamada.Fallida(ErrorDatos.DESCONOCIDO)
     }
 }
