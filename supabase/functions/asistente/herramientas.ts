@@ -3,7 +3,8 @@
 // Las de consulta leen los datos del usuario con las funciones SQL de la app, usando su token: la IA
 // solo ve lo que el usuario vería. Las de proponer no guardan nada: dejan lista una acción que la app
 // muestra con los botones Confirmar y Cancelar, y que solo se ejecuta si el usuario confirma
-// (confirmar_accion_asistente en asistente.sql).
+// (confirmar_accion_asistente en asistente.sql). fuera_de_tema no se ejecuta: conversacion.ts la ve y
+// contesta con una respuesta fija.
 
 import type Anthropic from "npm:@anthropic-ai/sdk@1.3.0";
 import type { SupabaseClient } from "npm:@supabase/supabase-js@2.118.0";
@@ -42,6 +43,9 @@ const PATRON_FECHA = /^\d{4}-\d{2}-\d{2}$/;
 const CODIGOS_DATO_INVALIDO = ["22023", "22007", "22008", "P0002"];
 
 const sinParametros = () => ({ type: "object" as const, properties: {}, required: [], additionalProperties: false });
+
+/** La pregunta no es de finanzas ni de la app: en vez de que Claude la conteste, va una respuesta fija. */
+export const FUERA_DE_TEMA = "fuera_de_tema";
 
 export const HERRAMIENTAS: Anthropic.Beta.BetaTool[] = [
   {
@@ -134,6 +138,15 @@ export const HERRAMIENTAS: Anthropic.Beta.BetaTool[] = [
       additionalProperties: false,
     },
   },
+  {
+    name: FUERA_DE_TEMA,
+    description:
+      "Úsala, sola y sin escribir texto, cuando la pregunta no tiene que ver con las finanzas personales del " +
+      "usuario ni con la app Finanzia (historia, cultura general, ciencia, noticias, deportes, salud, recetas, " +
+      "tareas, programación…). La app le contesta que solo ayudas con sus finanzas.",
+    strict: true,
+    input_schema: sinParametros(),
+  },
 ];
 
 /**
@@ -195,6 +208,12 @@ async function ejecutar(nombre: string, datos: Record<string, unknown>, contexto
     case "proponer_aporte":
       revisarSinPropuesta(contexto);
       return proponer(contexto, await aporte(contexto.supabase, datos));
+    // Sola la atiende conversacion.ts; si llega aquí, vino junto con otras herramientas.
+    case FUERA_DE_TEMA:
+      throw new ErrorHerramienta(
+        "fuera_de_tema va sola. Si una parte de la pregunta es de sus finanzas, responde solo esa parte y " +
+          "di en una frase que lo demás no lo puedes responder.",
+      );
     default:
       throw new ErrorHerramienta(`No existe la herramienta ${nombre}.`);
   }

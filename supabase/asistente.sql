@@ -7,7 +7,8 @@
 -- Las tablas `conversaciones` y `mensajes` ya existen (esquema.sql). Este archivo:
 --   1. Agrega a `mensajes` la acción que propone la IA (registrar un gasto, un ingreso o un aporte a
 --      una meta) y su estado. La IA nunca guarda nada sola: propone, la app muestra la propuesta con
---      los botones Confirmar y Cancelar, y solo al confirmar se ejecuta.
+--      los botones Confirmar y Cancelar, y solo al confirmar se ejecuta. También agrega el texto de la
+--      factura que el usuario fotografió, si la pregunta trajo una.
 --   2. Crea las funciones del chat:
 --      - conversaciones_asistente: las conversaciones del usuario, la más reciente primero.
 --      - mensajes_asistente: los mensajes de una conversación (la Edge Function los usa como memoria).
@@ -25,6 +26,9 @@
 alter table public.mensajes add column if not exists accion jsonb;
 -- 'pendiente', 'confirmada' o 'cancelada'; vacío si el mensaje no trae acción.
 alter table public.mensajes add column if not exists estado_accion character varying;
+-- El texto que la app leyó de la foto de una factura (OCR), en la pregunta que la trajo. La Edge
+-- Function se lo vuelve a mandar a la IA como parte de la memoria. Vacío si no trajo factura.
+alter table public.mensajes add column if not exists factura text;
 
 -- Las conversaciones se buscan por usuario y los mensajes por conversación, en orden.
 create index if not exists conversaciones_id_usuario_idx on public.conversaciones (id_usuario);
@@ -86,7 +90,8 @@ as $$
     'contenido', p_mensaje.contenido,
     'fecha', p_mensaje.fecha,
     'accion', p_mensaje.accion,
-    'estado_accion', p_mensaje.estado_accion
+    'estado_accion', p_mensaje.estado_accion,
+    'factura', p_mensaje.factura
   );
 $$;
 
@@ -170,11 +175,15 @@ $$;
 
 -- La pregunta y la respuesta se guardan juntas, cuando la IA ya respondió: si la IA falla no queda
 -- una pregunta sin respuesta. Sin conversación (p_conversacion vacío) crea una, con la pregunta como título.
+-- p_factura es el texto de la factura que trajo la pregunta, o vacío.
+-- La versión anterior no recibía p_factura; se borra para que no queden dos con el mismo nombre.
+drop function if exists public.guardar_intercambio_asistente(bigint, text, text, jsonb);
 create or replace function public.guardar_intercambio_asistente(
   p_conversacion bigint,
   p_pregunta text,
   p_respuesta text,
-  p_accion jsonb
+  p_accion jsonb,
+  p_factura text default null
 )
 returns json
 language plpgsql
@@ -193,6 +202,10 @@ begin
   if p_accion is not null and coalesce(p_accion ->> 'tipo', '') not in ('gasto', 'ingreso', 'aporte') then
     raise exception 'Acción no válida' using errcode = '22023';
   end if;
+  -- El mismo límite que revisa la Edge Function.
+  if length(p_factura) > 8000 then
+    raise exception 'La factura es demasiado larga' using errcode = '22023';
+  end if;
 
   if v_conversacion is null then
     insert into conversaciones (id_usuario, titulo)
@@ -202,8 +215,8 @@ begin
     perform revisar_conversacion(v_conversacion, v_usuario);
   end if;
 
-  insert into mensajes (id_conversacion, rol, contenido)
-  values (v_conversacion, 'user', trim(p_pregunta))
+  insert into mensajes (id_conversacion, rol, contenido, factura)
+  values (v_conversacion, 'user', trim(p_pregunta), nullif(trim(p_factura), ''))
   returning * into v_pregunta;
 
   -- clock_timestamp: la hora real de la respuesta (now() es la del inicio de la transacción).
@@ -357,14 +370,14 @@ revoke all on function public.json_mensaje(public.mensajes) from public, anon, a
 revoke all on function public.accion_pendiente(bigint, bigint) from public, anon, authenticated;
 revoke all on function public.conversaciones_asistente() from public, anon;
 revoke all on function public.mensajes_asistente(bigint) from public, anon;
-revoke all on function public.guardar_intercambio_asistente(bigint, text, text, jsonb) from public, anon;
+revoke all on function public.guardar_intercambio_asistente(bigint, text, text, jsonb, text) from public, anon;
 revoke all on function public.eliminar_conversacion_asistente(bigint) from public, anon;
 revoke all on function public.confirmar_accion_asistente(bigint) from public, anon;
 revoke all on function public.cancelar_accion_asistente(bigint) from public, anon;
 revoke all on function public.movimientos_asistente(date, date) from public, anon;
 grant execute on function public.conversaciones_asistente() to authenticated;
 grant execute on function public.mensajes_asistente(bigint) to authenticated;
-grant execute on function public.guardar_intercambio_asistente(bigint, text, text, jsonb) to authenticated;
+grant execute on function public.guardar_intercambio_asistente(bigint, text, text, jsonb, text) to authenticated;
 grant execute on function public.eliminar_conversacion_asistente(bigint) to authenticated;
 grant execute on function public.confirmar_accion_asistente(bigint) to authenticated;
 grant execute on function public.cancelar_accion_asistente(bigint) to authenticated;

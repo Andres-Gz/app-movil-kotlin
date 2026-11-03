@@ -8,6 +8,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.finanzia.R
 import com.example.finanzia.configuracion.Constantes
+import com.example.finanzia.datos.facturas.LecturaFactura
+import com.example.finanzia.datos.facturas.LectorFacturas
 import com.example.finanzia.datos.modelos.EstadoAccion
 import com.example.finanzia.datos.modelos.MensajeAsistente
 import com.example.finanzia.datos.repositorios.ErrorDatos
@@ -17,10 +19,13 @@ import kotlinx.coroutines.launch
 
 /**
  * El chat con Finanzia IA: manda las preguntas, muestra las respuestas, resuelve lo que propone la IA
- * (confirmar o cancelar) y abre, empieza o elimina conversaciones. La memoria la lleva el servidor:
- * basta con mandar el id de la conversación.
+ * (confirmar o cancelar), lee las fotos de facturas para que la IA registre el gasto y abre, empieza o
+ * elimina conversaciones. La memoria la lleva el servidor: basta con mandar el id de la conversación.
  */
-class AsistenteViewModel(private val repositorio: RepositorioAsistente) : ViewModel() {
+class AsistenteViewModel(
+    private val repositorio: RepositorioAsistente,
+    private val lector: LectorFacturas,
+) : ViewModel() {
 
     var estado by mutableStateOf(EstadoAsistente())
         private set
@@ -42,23 +47,47 @@ class AsistenteViewModel(private val repositorio: RepositorioAsistente) : ViewMo
 
     /** Las sugerencias se mandan tal cual, sin pasar por el campo de texto. */
     fun alElegirSugerencia(pregunta: String) {
-        if (estado.respondiendo || estado.cargandoMensajes) return
+        if (estado.ocupado || estado.cargandoMensajes) return
         preguntar(pregunta)
     }
 
-    private fun preguntar(pregunta: String) {
-        estado = estado.copy(preguntaEnviada = pregunta, texto = "", error = null)
+    /**
+     * Lee el texto de la foto de una factura y se lo manda a la IA, que propone el gasto para confirmarlo.
+     * Va con lo que haya escrito en el campo (por ejemplo "solo pagué la mitad") o, si está vacío, con
+     * [preguntaFactura] ("Registra el gasto de esta factura").
+     */
+    fun alElegirFactura(imagen: String, preguntaFactura: String) {
+        if (estado.ocupado || estado.cargandoMensajes) return
+        estado = estado.copy(leyendoFactura = true, atajosAbiertos = false, error = null)
         viewModelScope.launch {
-            estado = when (val llamada = repositorio.preguntar(estado.idConversacion, pregunta)) {
+            val lectura = lector.leer(imagen)
+            estado = estado.copy(leyendoFactura = false)
+            when (lectura) {
+                is LecturaFactura.Leida -> {
+                    val escrito = estado.texto.trim()
+                    preguntar(escrito.ifEmpty { preguntaFactura }, factura = lectura.texto, siFalla = escrito)
+                }
+                LecturaFactura.SinTexto -> estado = estado.copy(error = R.string.error_factura_sin_texto)
+                LecturaFactura.Fallida -> estado = estado.copy(error = R.string.error_factura_no_leida)
+            }
+        }
+    }
+
+    /** [siFalla] es lo que vuelve al campo si la IA no responde, para mandarlo otra vez sin reescribirlo. */
+    private fun preguntar(pregunta: String, factura: String? = null, siFalla: String = pregunta) {
+        estado = estado.copy(preguntaEnviada = pregunta, preguntaConFactura = factura != null, texto = "", error = null)
+        viewModelScope.launch {
+            estado = when (val llamada = repositorio.preguntar(estado.idConversacion, pregunta, factura)) {
                 is Llamada.Exitosa -> estado.copy(
                     idConversacion = llamada.valor.idConversacion,
                     mensajes = estado.mensajes + llamada.valor.pregunta + llamada.valor.respuesta,
                     preguntaEnviada = null,
+                    preguntaConFactura = false,
                 )
-                // La pregunta vuelve al campo para mandarla otra vez sin reescribirla.
                 is Llamada.Fallida -> estado.copy(
                     preguntaEnviada = null,
-                    texto = pregunta,
+                    preguntaConFactura = false,
+                    texto = siFalla,
                     error = mensajeError(llamada.error, R.string.error_asistente_sin_respuesta),
                 )
             }
@@ -115,7 +144,7 @@ class AsistenteViewModel(private val repositorio: RepositorioAsistente) : ViewMo
 
     /** Deja el chat vacío; la conversación nueva se crea al mandar la primera pregunta. */
     fun alNuevaConversacion() {
-        if (estado.respondiendo) return
+        if (estado.ocupado) return
         estado = EstadoAsistente(texto = estado.texto)
     }
 
@@ -157,7 +186,7 @@ class AsistenteViewModel(private val repositorio: RepositorioAsistente) : ViewMo
 
     /** Abre una conversación del historial con todos sus mensajes. */
     fun alAbrirConversacion(idConversacion: Long) {
-        if (estado.respondiendo) return
+        if (estado.ocupado) return
         estado = estado.copy(historialAbierto = false, cargandoMensajes = true, error = null)
         viewModelScope.launch {
             estado = when (val llamada = repositorio.mensajes(idConversacion)) {

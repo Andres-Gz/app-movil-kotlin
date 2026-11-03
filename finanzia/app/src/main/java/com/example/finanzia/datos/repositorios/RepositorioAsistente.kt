@@ -6,8 +6,11 @@ import com.example.finanzia.datos.modelos.MensajeAsistente
 
 /** El chat con Finanzia IA: preguntar, leer las conversaciones guardadas y resolver lo que propone la IA. */
 interface RepositorioAsistente {
-    /** Manda la pregunta a la IA. Sin [idConversacion] empieza una conversación nueva. */
-    suspend fun preguntar(idConversacion: Long?, pregunta: String): Llamada<IntercambioAsistente>
+    /**
+     * Manda la pregunta a la IA. Sin [idConversacion] empieza una conversación nueva. [factura] es el
+     * texto leído de la foto de una factura, para que la IA registre el gasto, o `null`.
+     */
+    suspend fun preguntar(idConversacion: Long?, pregunta: String, factura: String? = null): Llamada<IntercambioAsistente>
 
     /** Las conversaciones del usuario, la más reciente primero. */
     suspend fun conversaciones(): Llamada<List<ConversacionAsistente>>

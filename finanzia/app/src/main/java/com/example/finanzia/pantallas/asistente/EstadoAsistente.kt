@@ -13,6 +13,10 @@ data class EstadoAsistente(
     val texto: String = "",
     /** La pregunta que se mandó y todavía no tiene respuesta: se muestra mientras la IA piensa. */
     val preguntaEnviada: String? = null,
+    /** La pregunta enviada lleva el texto de una factura. */
+    val preguntaConFactura: Boolean = false,
+    /** Mientras se lee la foto de una factura, antes de mandársela a la IA. */
+    val leyendoFactura: Boolean = false,
     /** Mientras se leen los mensajes de una conversación del historial. */
     val cargandoMensajes: Boolean = false,
     @param:StringRes val error: Int? = null,
@@ -33,5 +37,8 @@ data class EstadoAsistente(
     /** Mientras la IA responde no se puede mandar otra pregunta. */
     val respondiendo: Boolean get() = preguntaEnviada != null
 
-    val puedeEnviar: Boolean get() = texto.isNotBlank() && !respondiendo && !cargandoMensajes
+    /** Mientras se lee una factura o la IA responde no se manda otra pregunta ni se cambia de conversación. */
+    val ocupado: Boolean get() = respondiendo || leyendoFactura
+
+    val puedeEnviar: Boolean get() = texto.isNotBlank() && !ocupado && !cargandoMensajes
 }

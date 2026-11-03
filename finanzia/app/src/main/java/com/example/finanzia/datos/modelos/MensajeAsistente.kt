@@ -14,6 +14,8 @@ data class MensajeAsistente(
     /** Lo que la IA propuso guardar en esta respuesta, o `null`. */
     val accion: AccionAsistente? = null,
     @SerialName("estado_accion") val estadoAccion: EstadoAccion? = null,
+    /** En una pregunta, el texto que se leyó de la foto de una factura, o `null` si no trajo. */
+    val factura: String? = null,
 )
 
 @Serializable
