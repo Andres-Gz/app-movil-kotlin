@@ -2,7 +2,7 @@
 
 Tu asistente financiero con IA. App Android hecha con Kotlin y Jetpack Compose.
 
-> **Estado:** en desarrollo. Tiene inicio de sesión, registro y recuperación de contraseña (con Supabase), la bienvenida y los primeros pasos, el inicio con los movimientos (que se pueden editar), las metas de ahorro y el chat con Finanzia IA.
+> **Estado:** en desarrollo. Tiene inicio de sesión, registro y recuperación de contraseña (con Supabase), la bienvenida y los primeros pasos, el inicio con los movimientos (que se pueden editar), las metas de ahorro y el chat con Finanzia IA, que también registra gastos desde la foto de una factura.
 
 ## Requisitos
 
@@ -34,7 +34,7 @@ Para que el registro, el inicio de sesión y la recuperación de contraseña fun
    - [`supabase/inicio.sql`](supabase/inicio.sql): crea la función `resumen_inicio`, que junta en una llamada lo que muestra el dashboard.
    - [`supabase/editar_movimientos.sql`](supabase/editar_movimientos.sql): crea `editar_movimiento` y `eliminar_movimiento`. Eliminar no borra la fila: la deja inactiva.
    - [`supabase/metas.sql`](supabase/metas.sql): agrega a `metas` la categoría, el icono y la regla de aporte (columnas opcionales) y crea las funciones de metas: `resumen_metas` (las metas con lo ahorrado y las fechas de los aportes), `crear_meta`, `editar_meta`, `aportar_meta` (guarda el aporte en `aportes`, desde la cuenta principal), `ajustar_regla_meta` y `eliminar_meta` (no borra la fila: la deja inactiva).
-   - [`supabase/asistente.sql`](supabase/asistente.sql): agrega a `mensajes` la acción que propone la IA y su estado, y crea las funciones del chat: listar conversaciones, leer sus mensajes, guardar cada pregunta con su respuesta, eliminar una conversación, confirmar o cancelar lo que propuso la IA y `movimientos_asistente` (los movimientos de un periodo, que consulta la IA). Va después de los anteriores porque confirmar usa `registrar_gasto`, `registrar_ingreso` y `aportar_meta`.
+   - [`supabase/asistente.sql`](supabase/asistente.sql): agrega a `mensajes` la acción que propone la IA, su estado y el texto de la factura fotografiada, y crea las funciones del chat: listar conversaciones, leer sus mensajes, guardar cada pregunta con su respuesta, eliminar una conversación, confirmar o cancelar lo que propuso la IA y `movimientos_asistente` (los movimientos de un periodo, que consulta la IA). Va después de los anteriores porque confirmar usa `registrar_gasto`, `registrar_ingreso` y `aportar_meta`. **Si ya lo habías corrido, córrelo otra vez** antes de desplegar la función de nuevo: agrega la columna `factura` y cambia `guardar_intercambio_asistente` para que la reciba.
 2. **Authentication → URL Configuration → Redirect URLs**: agrega `finanzia://recuperar`. Es la dirección del enlace del correo de recuperación, que abre la app en el paso 2.
 3. **Authentication → Sign In / Providers → Email → Confirm email**: si está activado, cada cuenta nueva debe confirmar su correo antes de entrar. El servicio de correo gratis de Supabase solo envía a los miembros del equipo del proyecto (y pocos correos por hora), así que para que cualquiera pueda registrarse hay que desactivarlo o configurar un SMTP propio en **Authentication → Emails → SMTP Settings**. Lo mismo aplica al correo de recuperación de contraseña.
 4. **El asistente (Finanzia IA)**. La IA es Claude, de Anthropic, y la app no le habla directo: lo hace la Edge Function [`supabase/functions/asistente`](supabase/functions/asistente), que guarda la llave de la API. Para activarlo:
@@ -47,6 +47,7 @@ Para que el registro, el inicio de sesión y la recuperación de contraseña fun
       ```
       `--no-verify-jwt` deja que la función revise la sesión ella misma (así funciona también con las claves publicables nuevas); sin una sesión válida responde 401 y no llama a la IA.
    4. Si el chat responde "Finanzia IA no pudo responder", el motivo queda en **Edge Functions → asistente → Logs** (por ejemplo, que falta el secreto o que la llave no tiene saldo).
+   5. Cada vez que cambie algo en `supabase/functions/asistente`, se vuelve a desplegar con el mismo comando. Si el cambio trae SQL nuevo (como la lectura de facturas), primero se corre el SQL y después se despliega.
 
 ## Cómo ejecutarla
 
@@ -71,7 +72,7 @@ Si la terminal no encuentra Java, usa el JDK que trae Android Studio. En Windows
 
 ```
 supabase/                               ← los SQL que se corren en Supabase y la Edge Function del asistente
-└── functions/asistente/                ← habla con la IA: index.ts (la petición), conversacion.ts (memoria) y herramientas.ts
+└── functions/asistente/                ← habla con la IA: index.ts (la petición), conversacion.ts (memoria, instrucciones y temas) y herramientas.ts
 finanzia/                               ← proyecto Android (esta es la carpeta que se abre en Android Studio)
 ├── gradle/libs.versions.toml           ← versiones de todas las dependencias
 └── app/src/
@@ -87,8 +88,9 @@ finanzia/                               ← proyecto Android (esta es la carpeta
     │   │   │   ├── Iconos.kt           ← los iconos, cada uno con un nombre que dice para qué es
     │   │   │   └── TemaFinanzia.kt     ← junta todo lo anterior en el tema de la app
     │   │   ├── componentes/            ← piezas reutilizables: campos, botones, avisos, fondo…
-    │   │   ├── datos/                  ← todo lo que habla con Supabase
+    │   │   ├── datos/                  ← todo lo que habla con Supabase, y la lectura de facturas
     │   │   │   ├── ClienteSupabase.kt  ← la conexión única de la app
+    │   │   │   ├── facturas/           ← lee el texto de la foto de una factura (OCR con ML Kit): interfaz e implementación
     │   │   │   ├── modelos/            ← las tablas mapeadas a data classes (p. ej. Usuario)
     │   │   │   └── repositorios/       ← acceso a los datos: una interfaz y su implementación
     │   │   ├── pantallas/
@@ -108,7 +110,7 @@ finanzia/                               ← proyecto Android (esta es la carpeta
     │   │   │   ├── editarmovimiento/     ← editar o eliminar un movimiento (se abre al tocarlo en el inicio)
     │   │   │   ├── metas/                ← ahorro, consejo de la IA, racha y cada meta; aportar, ajustar la regla y eliminar
     │   │   │   ├── nuevameta/            ← crear o editar una meta: nombre, categoría, monto, mes y frecuencia del aporte
-    │   │   │   └── asistente/            ← el chat con Finanzia IA: mensajes, propuestas para confirmar e historial
+    │   │   │   └── asistente/            ← el chat con Finanzia IA: mensajes, propuestas para confirmar, fotos de facturas e historial
     │   │   └── utilidades/             ← funciones que se usan en varios lugares (p. ej. RegistroErrores.kt, Validaciones.kt)
     │   └── res/values/strings.xml      ← todos los textos de la app
     ├── test/                           ← pruebas unitarias (corren en el computador)
@@ -231,6 +233,7 @@ En español, contando qué cambia y por qué. El asunto es corto y en presente, 
 - El proyecto usa AGP 8.13 con Gradle 8.14 para que abra también en las versiones de Android Studio de la universidad. Con AGP 8 el plugin `org.jetbrains.kotlin.android` sí es necesario.
 - La versión de lanzamiento todavía no se minifica (`isMinifyEnabled = false`).
 - Material 3 ya no incluye iconos: usamos `material-icons-extended`, siempre a través de `tema/Iconos.kt`.
+- La lectura de facturas usa ML Kit con el modelo incluido en la app (`com.google.mlkit:text-recognition`), que funciona sin Google Play Services y sin descargar nada al usarlo; a cambio, el APK pesa unos 4 MB más por arquitectura. La foto de la cámara se guarda siempre en el mismo archivo de la caché (`cache/facturas/factura.jpg`), compartido con la app de cámara mediante el `FileProvider` de `AndroidManifest.xml`; no hace falta pedir el permiso de cámara ni el de fotos.
 - Supabase se usa con [supabase-kt](https://github.com/supabase-community/supabase-kt) 3.2.6, la última versión compatible con nuestro Kotlin 2.2 (desde la 3.7 pide Kotlin 2.4).
 - El inicio de sesión lo hace Supabase Auth. La tabla `usuarios` solo aporta el perfil (se busca por correo) y la app nunca lee su columna `contrasena`.
 - El registro crea la cuenta en Supabase Auth y guarda el nombre como dato extra del usuario (`raw_user_meta_data`). La fila de `usuarios` la crea la base de datos con el disparador de `supabase/configuracion_cuentas.sql`; sin él, una cuenta nueva no puede iniciar sesión ("Tu cuenta no tiene un perfil registrado").
@@ -242,6 +245,8 @@ En español, contando qué cambia y por qué. El asunto es corto y en presente, 
 - **Memoria.** El modelo no recuerda nada entre una pregunta y otra. Cada pregunta y su respuesta se guardan en `conversaciones` y `mensajes`, y en cada pregunta nueva la función le vuelve a mandar los últimos 40 mensajes. Por eso, si arriba le dijiste "70", en el siguiente mensaje lo sabe.
 - **Acceso a los datos.** La IA no escribe SQL ni toca la base. Tiene herramientas (`consultar_resumen`, `consultar_movimientos`, `consultar_metas`) que la función ejecuta con las mismas funciones SQL de la app y con el token del usuario, así que solo ve los datos de quien pregunta.
 - **Registrar desde el chat.** Con `proponer_gasto`, `proponer_ingreso` y `proponer_aporte` la IA solo propone: la respuesta trae una tarjeta con Confirmar y Cancelar, y se guarda únicamente si el usuario confirma (`confirmar_accion_asistente`, que usa `registrar_gasto`, `registrar_ingreso` y `aportar_meta`).
+- **Solo temas de la app.** La IA responde únicamente sobre las finanzas del usuario (gastos, ingresos, presupuesto, ahorro, metas, deudas, hábitos e ideas de finanzas personales) y sobre cómo usar Finanzia. Si le preguntan otra cosa ("¿en qué año murió Hitler?", una receta, una tarea), usa la herramienta `fuera_de_tema` y la función contesta siempre la misma respuesta fija ("Fuera de mi alcance…"), sin nada de lo que la IA haya escrito: así no responde ni una parte. Si la pregunta mezcla las dos cosas, responde solo la parte de finanzas. Las reglas están en la sección "Temas" de `instrucciones()` en `conversacion.ts`; para ampliar o cerrar lo que acepta, se cambian ahí.
+- **Facturas (OCR).** En el chat, el "+" tiene "Foto de una factura" (abre la cámara) y "Factura de la galería". El teléfono lee el texto de la foto con [ML Kit](https://developers.google.com/ml-kit/vision/text-recognition/v2/android) (`datos/facturas/LectorFacturasMlKit.kt`), sin internet: la foto nunca sale del teléfono. Ese texto, ordenado renglón por renglón para que "TOTAL" y su valor queden juntos, va a la función como `factura` junto con la pregunta ("Registra el gasto de esta factura", o lo que el usuario haya escrito en el campo, como "solo pagué la mitad"). La IA busca el total, el comercio y la categoría y lo propone con `proponer_gasto`: el usuario lo revisa y lo confirma en la tarjeta, como cualquier otro gasto. El texto de la factura se guarda en `mensajes.factura`, así la IA lo recuerda en las preguntas siguientes. Se le manda entre `<factura>` y `</factura>` y las instrucciones le dicen que es solo un dato: si la factura trae algo que parezca una orden, no la sigue. El gasto se guarda con la fecha de hoy, aunque la factura sea de otro día.
 - **Modelo.** Claude Opus 5.5 (`claude-opus-5-5`), con esfuerzo `medium`; se cambian en `conversacion.ts`. Si los filtros de seguridad rechazan una pregunta, la API la reintenta sola con otro modelo (`fallbacks: "default"`) y, si igual la rechaza, la app muestra una respuesta amable.
 - **Pruebas de la función** (sin llamar a la IA), desde la raíz del repositorio y con [Deno](https://deno.com): `deno test supabase/functions/asistente`.
 

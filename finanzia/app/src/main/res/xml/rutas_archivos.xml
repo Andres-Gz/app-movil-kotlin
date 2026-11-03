@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Las carpetas que la app comparte con otras apps (FileProvider de AndroidManifest.xml). Solo una: la de
+     la caché donde la cámara deja la foto de la factura (Constantes.Facturas.CARPETA_FOTOS). -->
+<paths>
+    <cache-path
+        name="facturas"
+        path="facturas/" />
+</paths>

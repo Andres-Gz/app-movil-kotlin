@@ -5,6 +5,7 @@ import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.speech.RecognizerIntent
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -27,8 +28,10 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -39,6 +42,8 @@ import com.example.finanzia.componentes.BarraSuperiorApp
 import com.example.finanzia.componentes.OrigenError
 import com.example.finanzia.componentes.SeccionNavegacion
 import com.example.finanzia.configuracion.Constantes
+import com.example.finanzia.datos.facturas.LectorFacturasMlKit
+import com.example.finanzia.datos.facturas.direccionFotoFactura
 import com.example.finanzia.datos.modelos.AccionAsistente
 import com.example.finanzia.datos.modelos.EstadoAccion
 import com.example.finanzia.datos.modelos.MensajeAsistente
@@ -62,6 +67,8 @@ data class AccionesAsistente(
     val alAbrirAtajos: () -> Unit = {},
     val alCerrarAtajos: () -> Unit = {},
     val alElegirAtajo: (String) -> Unit = {},
+    val alTomarFotoFactura: () -> Unit = {},
+    val alElegirFotoFactura: () -> Unit = {},
     val alConfirmarAccion: (MensajeAsistente) -> Unit = {},
     val alCancelarAccion: (MensajeAsistente) -> Unit = {},
     val alAbrirMenu: () -> Unit = {},
@@ -86,7 +93,9 @@ fun PantallaAsistente(
     alAbrirInicio: () -> Unit,
     alAbrirMetas: () -> Unit,
     alAvisar: (Int) -> Unit,
-    viewModel: AsistenteViewModel = viewModel { AsistenteViewModel(RepositorioAsistenteSupabase()) },
+    viewModel: AsistenteViewModel = LocalContext.current.applicationContext.let { contexto ->
+        viewModel { AsistenteViewModel(RepositorioAsistenteSupabase(), LectorFacturasMlKit(contexto)) }
+    },
 ) {
     val estado = viewModel.estado
     LaunchedEffect(estado.aviso) {
@@ -101,6 +110,17 @@ fun PantallaAsistente(
         if (resultado.resultCode == Activity.RESULT_OK && texto != null) viewModel.alDictar(texto)
     }
     val indicacionDictado = stringResource(R.string.asistente_dictado_indicacion)
+    // La foto de la factura: la cámara la deja en un archivo de la app y la galería devuelve la elegida.
+    // El texto lo lee el teléfono (LectorFacturasMlKit) y solo ese texto va a la IA.
+    val contexto = LocalContext.current
+    val preguntaFactura = stringResource(R.string.asistente_factura_pregunta)
+    val fotoFactura = remember { direccionFotoFactura(contexto) }
+    val camara = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { tomada ->
+        if (tomada) viewModel.alElegirFactura(fotoFactura.toString(), preguntaFactura)
+    }
+    val galeria = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { foto ->
+        if (foto != null) viewModel.alElegirFactura(foto.toString(), preguntaFactura)
+    }
     ContenidoAsistente(
         estado = estado,
         ahora = Date(),
@@ -125,6 +145,22 @@ fun PantallaAsistente(
             alAbrirAtajos = viewModel::alAbrirAtajos,
             alCerrarAtajos = viewModel::alCerrarAtajos,
             alElegirAtajo = viewModel::alElegirAtajo,
+            alTomarFotoFactura = {
+                viewModel.alCerrarAtajos()
+                try {
+                    camara.launch(fotoFactura)
+                } catch (_: ActivityNotFoundException) {
+                    alAvisar(R.string.asistente_sin_camara)
+                }
+            },
+            alElegirFotoFactura = {
+                viewModel.alCerrarAtajos()
+                try {
+                    galeria.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                } catch (_: ActivityNotFoundException) {
+                    alAvisar(R.string.asistente_sin_galeria)
+                }
+            },
             alConfirmarAccion = viewModel::alConfirmarAccion,
             alCancelarAccion = viewModel::alCancelarAccion,
             alAbrirMenu = viewModel::alAbrirMenu,
@@ -158,7 +194,7 @@ private fun ContenidoAsistente(estado: EstadoAsistente, ahora: Date, acciones: A
         EncabezadoAsistente(estado, acciones)
         Spacer(Modifier.height(Dimensiones.espacioPequeno))
         SugerenciasAsistente(alElegir = acciones.alElegirSugerencia)
-        val sugerenciaVisible = estado.texto.isEmpty() && !estado.respondiendo
+        val sugerenciaVisible = estado.texto.isEmpty() && !estado.ocupado
         ListaMensajes(
             estado = estado,
             ahora = ahora,
@@ -193,12 +229,12 @@ private fun ListaMensajes(
     modifier: Modifier,
 ) {
     val lista = rememberLazyListState()
-    val bienvenida = estado.mensajes.isEmpty() && !estado.respondiendo
-    val elementos = (if (bienvenida) 1 else 0) + estado.mensajes.size +
+    val bienvenida = estado.mensajes.isEmpty() && !estado.ocupado
+    val elementos = (if (bienvenida) 1 else 0) + estado.mensajes.size + (if (estado.leyendoFactura) 1 else 0) +
         (if (estado.respondiendo) 2 else 0) + (if (estado.error != null) 1 else 0)
-    // Cada mensaje nuevo, la pregunta que se está mandando o un error dejan la lista al final. También cuando
-    // aparece la sugerencia flotante, que le quita espacio a la lista.
-    LaunchedEffect(estado.mensajes.size, estado.respondiendo, estado.error, sugerenciaVisible) {
+    // Cada mensaje nuevo, la factura que se está leyendo, la pregunta que se está mandando o un error dejan
+    // la lista al final. También cuando aparece la sugerencia flotante, que le quita espacio a la lista.
+    LaunchedEffect(estado.mensajes.size, estado.leyendoFactura, estado.respondiendo, estado.error, sugerenciaVisible) {
         if (elementos > 0) lista.animateScrollToItem(elementos - 1)
     }
     if (estado.cargandoMensajes) {
@@ -224,7 +260,11 @@ private fun ListaMensajes(
         }
         items(estado.mensajes, key = { it.idMensaje }) { mensaje ->
             when (mensaje.rol) {
-                RolMensaje.USUARIO -> BurbujaUsuario(texto = mensaje.contenido, pie = pieEntregado(mensaje))
+                RolMensaje.USUARIO -> BurbujaUsuario(
+                    texto = mensaje.contenido,
+                    pie = pieEntregado(mensaje),
+                    conFactura = mensaje.factura != null,
+                )
                 RolMensaje.ASISTENTE -> RespuestaGuardada(mensaje, ahora) {
                     mensaje.accion?.let { accion ->
                         TarjetaAccion(
@@ -238,8 +278,13 @@ private fun ListaMensajes(
                 }
             }
         }
+        if (estado.leyendoFactura) {
+            item { TarjetaPensando(titulo = stringResource(R.string.asistente_factura_leyendo)) }
+        }
         estado.preguntaEnviada?.let { pregunta ->
-            item { BurbujaUsuario(texto = pregunta, pie = stringResource(R.string.asistente_enviando)) }
+            item {
+                BurbujaUsuario(texto = pregunta, pie = stringResource(R.string.asistente_enviando), conFactura = estado.preguntaConFactura)
+            }
             item { TarjetaPensando() }
         }
         estado.error?.let { error ->

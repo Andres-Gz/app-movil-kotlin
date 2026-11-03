@@ -36,6 +36,18 @@
                     android:scheme="finanzia" />
             </intent-filter>
         </activity>
+
+        <!-- Comparte con la app de cámara el archivo donde deja la foto de una factura
+             (debe coincidir con Constantes.Facturas.SUFIJO_PROVEEDOR). -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.archivos"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/rutas_archivos" />
+        </provider>
     </application>
 
 </manifest>

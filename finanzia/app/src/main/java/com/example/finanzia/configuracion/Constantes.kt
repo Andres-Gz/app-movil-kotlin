@@ -83,6 +83,7 @@ object Constantes {
         const val SIN_CONEXION = "No hubo conexión con Supabase"
         const val ERROR_SERVIDOR = "Supabase respondió con un error"
         const val RESPUESTA_INESPERADA = "Supabase respondió algo que la app no entiende"
+        const val FACTURA_NO_LEIDA = "No se pudo leer la foto de la factura"
     }
 
     /** Formatos de montos y fechas. */
@@ -136,6 +137,9 @@ object Constantes {
         const val CAMPO_CONVERSACION = "id_conversacion"
         const val CAMPO_MENSAJE = "mensaje"
 
+        /** El texto leído de la foto de una factura; solo va si la pregunta trae una. */
+        const val CAMPO_FACTURA = "factura"
+
         /** Cuánto se espera la respuesta: la IA puede consultar los datos varias veces antes de contestar. */
         const val ESPERA_MAXIMA_MILISEGUNDOS = 120_000L
 
@@ -155,6 +159,26 @@ object Constantes {
         const val MILISEGUNDOS_POR_MINUTO = 60_000L
         const val MINUTOS_POR_HORA = 60L
         const val HORAS_POR_DIA = 24L
+    }
+
+    /** La foto de una factura que se lee en el chat para registrar el gasto. */
+    object Facturas {
+        /** Lo máximo que se le manda a la IA del texto leído; el mismo límite que revisa la Edge Function. */
+        const val LARGO_MAXIMO_TEXTO = 8000
+
+        /**
+         * La foto se achica hasta que su lado más largo no pase de esto (en píxeles). Alcanza para leer el
+         * texto y evita que una foto de 50 megapíxeles llene la memoria del teléfono.
+         */
+        const val LADO_MAXIMO_FOTO = 3000
+
+        /**
+         * Dónde deja la cámara la foto: siempre el mismo archivo, en la caché de la app. El proveedor es
+         * el de AndroidManifest.xml (`${applicationId}.archivos`) y la carpeta, la de res/xml/rutas_archivos.xml.
+         */
+        const val SUFIJO_PROVEEDOR = ".archivos"
+        const val CARPETA_FOTOS = "facturas"
+        const val ARCHIVO_FOTO = "factura.jpg"
     }
 
     /** Reglas de validación de formularios. */

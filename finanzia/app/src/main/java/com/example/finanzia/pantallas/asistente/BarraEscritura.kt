@@ -104,7 +104,10 @@ private fun ChipSugerencia(icono: ImageVector, colorIcono: Color, texto: String,
     }
 }
 
-/** La barra blanca de abajo: el "+" con atajos, el campo, el dictado por voz y el botón de enviar. */
+/**
+ * La barra blanca de abajo: el "+" con atajos y la foto de una factura, el campo, el dictado por voz y el
+ * botón de enviar. La factura no se ofrece mientras se lee otra o la IA responde.
+ */
 @Composable
 internal fun BarraEscritura(estado: EstadoAsistente, acciones: AccionesAsistente) {
     val forma = RoundedCornerShape(Dimensiones.radioAvisoGrande)
@@ -123,6 +126,10 @@ internal fun BarraEscritura(estado: EstadoAsistente, acciones: AccionesAsistente
                 atajos.forEach { atajo ->
                     val texto = stringResource(atajo.texto)
                     OpcionMenu(Iconos.agregarCirculo, stringResource(atajo.nombre), Colores.tinta) { acciones.alElegirAtajo(texto) }
+                }
+                if (!estado.ocupado) {
+                    OpcionMenu(Iconos.fotoFactura, stringResource(R.string.asistente_factura_camara), Colores.tinta, acciones.alTomarFotoFactura)
+                    OpcionMenu(Iconos.galeriaFactura, stringResource(R.string.asistente_factura_galeria), Colores.tinta, acciones.alElegirFotoFactura)
                 }
             }
         }
