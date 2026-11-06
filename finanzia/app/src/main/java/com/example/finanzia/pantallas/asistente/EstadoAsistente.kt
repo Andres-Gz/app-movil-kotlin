@@ -34,4 +34,6 @@ data class EstadoAsistente(
     val respondiendo: Boolean get() = preguntaEnviada != null
 
     val puedeEnviar: Boolean get() = texto.isNotBlank() && !respondiendo && !cargandoMensajes
+
+    val puedeTomarFoto: Boolean get() = !respondiendo && !cargandoMensajes
 }

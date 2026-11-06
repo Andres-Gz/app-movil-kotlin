@@ -2,6 +2,7 @@ package com.example.finanzia.pantallas.asistente
 
 import android.app.Activity
 import android.content.ActivityNotFoundException
+import android.content.Context
 import android.content.Intent
 import android.speech.RecognizerIntent
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -29,6 +30,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -45,6 +47,8 @@ import com.example.finanzia.datos.modelos.MensajeAsistente
 import com.example.finanzia.datos.modelos.RolMensaje
 import com.example.finanzia.datos.modelos.TipoAccion
 import com.example.finanzia.datos.repositorios.RepositorioAsistenteSupabase
+import com.example.finanzia.fotos.LectorTextoMlKit
+import com.example.finanzia.fotos.recordarCamara
 import com.example.finanzia.tema.Colores
 import com.example.finanzia.tema.Dimensiones
 import com.example.finanzia.tema.TemaFinanzia
@@ -62,6 +66,7 @@ data class AccionesAsistente(
     val alAbrirAtajos: () -> Unit = {},
     val alCerrarAtajos: () -> Unit = {},
     val alElegirAtajo: (String) -> Unit = {},
+    val alTomarFoto: () -> Unit = {},
     val alConfirmarAccion: (MensajeAsistente) -> Unit = {},
     val alCancelarAccion: (MensajeAsistente) -> Unit = {},
     val alAbrirMenu: () -> Unit = {},
@@ -86,7 +91,8 @@ fun PantallaAsistente(
     alAbrirInicio: () -> Unit,
     alAbrirMetas: () -> Unit,
     alAvisar: (Int) -> Unit,
-    viewModel: AsistenteViewModel = viewModel { AsistenteViewModel(RepositorioAsistenteSupabase()) },
+    contexto: Context = LocalContext.current.applicationContext,
+    viewModel: AsistenteViewModel = viewModel { AsistenteViewModel(RepositorioAsistenteSupabase(), LectorTextoMlKit(contexto)) },
 ) {
     val estado = viewModel.estado
     LaunchedEffect(estado.aviso) {
@@ -101,6 +107,11 @@ fun PantallaAsistente(
         if (resultado.resultCode == Activity.RESULT_OK && texto != null) viewModel.alDictar(texto)
     }
     val indicacionDictado = stringResource(R.string.asistente_dictado_indicacion)
+    val etiquetaFoto = stringResource(R.string.asistente_foto_etiqueta)
+    val abrirCamara = recordarCamara(
+        alTomarFoto = { foto -> viewModel.alTomarFoto(foto, etiquetaFoto) },
+        alNoHaberCamara = { alAvisar(R.string.asistente_sin_camara) },
+    )
     ContenidoAsistente(
         estado = estado,
         ahora = Date(),
@@ -125,6 +136,10 @@ fun PantallaAsistente(
             alAbrirAtajos = viewModel::alAbrirAtajos,
             alCerrarAtajos = viewModel::alCerrarAtajos,
             alElegirAtajo = viewModel::alElegirAtajo,
+            alTomarFoto = {
+                viewModel.alCerrarAtajos()
+                if (estado.puedeTomarFoto) abrirCamara()
+            },
             alConfirmarAccion = viewModel::alConfirmarAccion,
             alCancelarAccion = viewModel::alCancelarAccion,
             alAbrirMenu = viewModel::alAbrirMenu,

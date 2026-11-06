@@ -19,6 +19,7 @@ import androidx.compose.material.icons.outlined.HighlightOff
 import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.Lightbulb
 import androidx.compose.material.icons.outlined.Mic
+import androidx.compose.material.icons.outlined.PhotoCamera
 import androidx.compose.material.icons.outlined.Savings
 import androidx.compose.material.icons.outlined.Verified
 import androidx.compose.material.icons.outlined.Laptop
@@ -208,6 +209,7 @@ object Iconos {
     val idea: ImageVector = Icons.Outlined.Lightbulb
     val alcanciaContorno: ImageVector = Icons.Outlined.Savings
     val microfono: ImageVector = Icons.Outlined.Mic
+    val camara: ImageVector = Icons.Outlined.PhotoCamera
     val enviar: ImageVector = salida
 }
 

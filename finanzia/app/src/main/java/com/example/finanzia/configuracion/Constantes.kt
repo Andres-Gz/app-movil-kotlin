@@ -83,6 +83,7 @@ object Constantes {
         const val SIN_CONEXION = "No hubo conexión con Supabase"
         const val ERROR_SERVIDOR = "Supabase respondió con un error"
         const val RESPUESTA_INESPERADA = "Supabase respondió algo que la app no entiende"
+        const val FOTO_NO_LEIDA = "No se pudo leer el texto de la foto"
     }
 
     /** Formatos de montos y fechas. */
@@ -135,12 +136,14 @@ object Constantes {
         const val FUNCION = "asistente"
         const val CAMPO_CONVERSACION = "id_conversacion"
         const val CAMPO_MENSAJE = "mensaje"
+        const val CAMPO_TEXTO_FOTO = "texto_foto"
 
         /** Cuánto se espera la respuesta: la IA puede consultar los datos varias veces antes de contestar. */
         const val ESPERA_MAXIMA_MILISEGUNDOS = 120_000L
 
-        /** El mismo límite que revisa la Edge Function. */
+        /** Los mismos límites que revisa la Edge Function. */
         const val LARGO_MAXIMO_PREGUNTA = 2000
+        const val LARGO_MAXIMO_FOTO = 8000
 
         /** La IA empieza cada respuesta con "# Título" y resalta las cifras con **negrita**. */
         const val MARCA_TITULO = "# "
@@ -155,6 +158,22 @@ object Constantes {
         const val MILISEGUNDOS_POR_MINUTO = 60_000L
         const val MINUTOS_POR_HORA = 60L
         const val HORAS_POR_DIA = 24L
+    }
+
+    /** Tomar una foto y leer su texto. */
+    object Fotos {
+        // La carpeta y el sufijo deben coincidir con res/xml/rutas_fotos.xml y con AndroidManifest.xml.
+        const val CARPETA = "fotos"
+        const val ARCHIVO = "factura.jpg"
+        const val SUFIJO_PROVEEDOR = ".fotos"
+
+        /** Cuántas esquinas trae cada línea que lee el OCR. */
+        const val ESQUINAS_LINEA = 4
+
+        /** Dos líneas son del mismo renglón si sus centros distan menos que esta fracción de su alto. */
+        const val TOLERANCIA_RENGLON = 0.5
+        const val SEPARADOR_RENGLONES = "\n"
+        const val SEPARADOR_COLUMNAS = "  "
     }
 
     /** Reglas de validación de formularios. */

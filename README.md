@@ -2,7 +2,7 @@
 
 Tu asistente financiero con IA. App Android hecha con Kotlin y Jetpack Compose.
 
-> **Estado:** en desarrollo. Tiene inicio de sesión, registro y recuperación de contraseña (con Supabase), la bienvenida y los primeros pasos, el inicio con los movimientos (que se pueden editar), las metas de ahorro y el chat con Finanzia IA.
+> **Estado:** en desarrollo. Tiene inicio de sesión, registro y recuperación de contraseña (con Supabase), la bienvenida y los primeros pasos, el inicio con los movimientos (que se pueden editar), las metas de ahorro y el chat con Finanzia IA, que también registra gastos e ingresos desde la foto de una factura.
 
 ## Requisitos
 
@@ -91,6 +91,7 @@ finanzia/                               ← proyecto Android (esta es la carpeta
     │   │   │   ├── ClienteSupabase.kt  ← la conexión única de la app
     │   │   │   ├── modelos/            ← las tablas mapeadas a data classes (p. ej. Usuario)
     │   │   │   └── repositorios/       ← acceso a los datos: una interfaz y su implementación
+    │   │   ├── fotos/                  ← tomar una foto y leer su texto: la cámara del teléfono y el OCR (ML Kit)
     │   │   ├── pantallas/
     │   │   │   ├── iniciosesion/       ← una carpeta por pantalla
     │   │   │   │   ├── PantallaInicioSesion.kt
@@ -230,6 +231,7 @@ En español, contando qué cambia y por qué. El asunto es corto y en presente, 
 - Las dependencias se declaran solo en `gradle/libs.versions.toml`. Las de Compose van sin versión porque la fija el BOM.
 - El proyecto usa AGP 8.13 con Gradle 8.14 para que abra también en las versiones de Android Studio de la universidad. Con AGP 8 el plugin `org.jetbrains.kotlin.android` sí es necesario.
 - La versión de lanzamiento todavía no se minifica (`isMinifyEnabled = false`).
+- El OCR usa la versión de ML Kit que trae el modelo dentro de la app (`text-recognition`), para que funcione desde la primera foto y sin depender de Google Play. Le suma unos 16 MB al APK; `build.gradle.kts` quita la arquitectura x86 y comprime las librerías nativas para que no sean más.
 - Material 3 ya no incluye iconos: usamos `material-icons-extended`, siempre a través de `tema/Iconos.kt`.
 - Supabase se usa con [supabase-kt](https://github.com/supabase-community/supabase-kt) 3.2.6, la última versión compatible con nuestro Kotlin 2.2 (desde la 3.7 pide Kotlin 2.4).
 - El inicio de sesión lo hace Supabase Auth. La tabla `usuarios` solo aporta el perfil (se busca por correo) y la app nunca lee su columna `contrasena`.
@@ -242,6 +244,9 @@ En español, contando qué cambia y por qué. El asunto es corto y en presente, 
 - **Memoria.** El modelo no recuerda nada entre una pregunta y otra. Cada pregunta y su respuesta se guardan en `conversaciones` y `mensajes`, y en cada pregunta nueva la función le vuelve a mandar los últimos 40 mensajes. Por eso, si arriba le dijiste "70", en el siguiente mensaje lo sabe.
 - **Acceso a los datos.** La IA no escribe SQL ni toca la base. Tiene herramientas (`consultar_resumen`, `consultar_movimientos`, `consultar_metas`) que la función ejecuta con las mismas funciones SQL de la app y con el token del usuario, así que solo ve los datos de quien pregunta.
 - **Registrar desde el chat.** Con `proponer_gasto`, `proponer_ingreso` y `proponer_aporte` la IA solo propone: la respuesta trae una tarjeta con Confirmar y Cancelar, y se guarda únicamente si el usuario confirma (`confirmar_accion_asistente`, que usa `registrar_gasto`, `registrar_ingreso` y `aportar_meta`).
+- **Solo temas de la app.** Las instrucciones de la IA (`instrucciones` en `conversacion.ts`) la limitan a las finanzas del usuario y al uso de Finanzia. A lo demás ("¿cuándo murió Hitler?") responde siempre el mismo mensaje, aunque insistan o lo disfracen de pregunta de plata. Está en el servidor porque ahí no se puede cambiar desde la app. Es una instrucción, no un filtro: si algún día se deja enredar, se ajusta ese texto y se vuelve a desplegar la función.
+- **Fotos de facturas.** En el "+" del chat, "Tomar foto de una factura" abre la cámara del teléfono (por eso la app no pide el permiso de cámara). El OCR lo hace [ML Kit](https://developers.google.com/ml-kit/vision/text-recognition/v2) en el teléfono, sin internet, y la foto se borra apenas se lee: a la Edge Function solo le llega el texto (`texto_foto`). Con eso la IA usa `proponer_gasto` o `proponer_ingreso`, así que nada se guarda sin Confirmar. El texto de la foto no queda en la base: se guarda la etiqueta "📷 Foto de una factura" y la respuesta de la IA, que por eso escribe el comercio, la fecha y el total. Tampoco se le obedece: es un dato, y si dice "ignora tus instrucciones" no pasa nada. Lo que se confirma queda con la fecha de hoy, no con la de la factura.
+- **Por qué `Renglones.kt`.** El OCR entrega las columnas de una factura por separado ("TOTAL" en un lado y "58.900" en otro). `armarRenglones` las vuelve a juntar usando la posición de cada línea, y antes endereza la foto, porque con dos grados de inclinación un precio ya cae en el renglón de abajo.
 - **Modelo.** Claude Opus 5.5 (`claude-opus-5-5`), con esfuerzo `medium`; se cambian en `conversacion.ts`. Si los filtros de seguridad rechazan una pregunta, la API la reintenta sola con otro modelo (`fallbacks: "default"`) y, si igual la rechaza, la app muestra una respuesta amable.
 - **Pruebas de la función** (sin llamar a la IA), desde la raíz del repositorio y con [Deno](https://deno.com): `deno test supabase/functions/asistente`.
 

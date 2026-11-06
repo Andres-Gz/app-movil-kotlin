@@ -170,6 +170,9 @@ $$;
 
 -- La pregunta y la respuesta se guardan juntas, cuando la IA ya respondió: si la IA falla no queda
 -- una pregunta sin respuesta. Sin conversación (p_conversacion vacío) crea una, con la pregunta como título.
+-- Una versión anterior recibía también el texto de una factura (p_factura). Si se llegó a correr, se
+-- borra: con las dos, Supabase no sabría cuál usar.
+drop function if exists public.guardar_intercambio_asistente(bigint, text, text, jsonb, text);
 create or replace function public.guardar_intercambio_asistente(
   p_conversacion bigint,
   p_pregunta text,

@@ -1,7 +1,8 @@
 // Edge Function "asistente": el chat de Finanzia con Claude.
 //
 // La app manda {"id_conversacion": 12, "mensaje": "..."} (id_conversacion vacío para un chat nuevo) con
-// el token de la sesión, y recibe la pregunta y la respuesta ya guardadas:
+// el token de la sesión, y recibe la pregunta y la respuesta ya guardadas. Si el usuario tomó una foto,
+// también manda "texto_foto": lo que el OCR del teléfono leyó en ella; va a la IA pero no se guarda.
 //   1. Comprueba la sesión. Sin una sesión válida no se llama a la IA (cada llamada cuesta).
 //   2. Lee los mensajes anteriores de la conversación: son la memoria del chat.
 //   3. Le pregunta a Claude (conversacion.ts), que usa las herramientas de herramientas.ts para leer los
@@ -16,6 +17,7 @@ import { type MensajeGuardado, responder } from "./conversacion.ts";
 import { ErrorBaseDatos, llamarFuncion } from "./herramientas.ts";
 
 const LARGO_MAXIMO_PREGUNTA = 2000;
+const LARGO_MAXIMO_FOTO = 8000;
 // Código de Postgres cuando la conversación no existe o es de otra persona.
 const NO_ENCONTRADO = "P0002";
 
@@ -39,7 +41,11 @@ Deno.serve(async (peticion) => {
   const cuerpo = await peticion.json().catch(() => null);
   const pregunta = typeof cuerpo?.mensaje === "string" ? cuerpo.mensaje.trim() : "";
   const conversacion = Number.isInteger(cuerpo?.id_conversacion) ? cuerpo.id_conversacion as number : null;
+  const textoFoto = typeof cuerpo?.texto_foto === "string" ? cuerpo.texto_foto.trim() : null;
   if (!pregunta || pregunta.length > LARGO_MAXIMO_PREGUNTA) return responderJson(400, { error: "pregunta_no_valida" });
+  if (textoFoto !== null && (!textoFoto || textoFoto.length > LARGO_MAXIMO_FOTO)) {
+    return responderJson(400, { error: "foto_no_valida" });
+  }
 
   try {
     const historial = conversacion === null
@@ -51,6 +57,7 @@ Deno.serve(async (peticion) => {
       await nombreDelUsuario(supabase),
       historial,
       pregunta,
+      textoFoto,
     );
     const guardado = await llamarFuncion(supabase, "guardar_intercambio_asistente", {
       p_conversacion: conversacion,

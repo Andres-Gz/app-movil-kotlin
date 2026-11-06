@@ -120,6 +120,7 @@ internal fun BarraEscritura(estado: EstadoAsistente, acciones: AccionesAsistente
         Box {
             BotonEscritura(Iconos.agregarCirculo, stringResource(R.string.accion_atajos), acciones.alAbrirAtajos)
             DropdownMenu(expanded = estado.atajosAbiertos, onDismissRequest = acciones.alCerrarAtajos, containerColor = Colores.superficie) {
+                OpcionMenu(Iconos.camara, stringResource(R.string.asistente_atajo_foto), Colores.tinta, acciones.alTomarFoto)
                 atajos.forEach { atajo ->
                     val texto = stringResource(atajo.texto)
                     OpcionMenu(Iconos.agregarCirculo, stringResource(atajo.nombre), Colores.tinta) { acciones.alElegirAtajo(texto) }
