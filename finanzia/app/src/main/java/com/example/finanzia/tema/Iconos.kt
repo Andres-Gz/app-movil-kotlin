@@ -40,8 +40,6 @@ import androidx.compose.material.icons.outlined.Forum
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.Payments
-import androidx.compose.material.icons.outlined.PhotoCamera
-import androidx.compose.material.icons.outlined.PhotoLibrary
 import androidx.compose.material.icons.outlined.PriceCheck
 import androidx.compose.material.icons.outlined.ShoppingCart
 import androidx.compose.material.icons.outlined.SmartToy
@@ -211,8 +209,6 @@ object Iconos {
     val alcanciaContorno: ImageVector = Icons.Outlined.Savings
     val microfono: ImageVector = Icons.Outlined.Mic
     val enviar: ImageVector = salida
-    val fotoFactura: ImageVector = Icons.Outlined.PhotoCamera
-    val galeriaFactura: ImageVector = Icons.Outlined.PhotoLibrary
 }
 
 /** Lado de la cuadrícula en la que se dibujan los iconos propios. */

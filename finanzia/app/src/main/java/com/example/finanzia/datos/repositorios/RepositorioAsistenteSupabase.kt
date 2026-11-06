@@ -27,7 +27,7 @@ class RepositorioAsistenteSupabase(
 
     private val json = Json { ignoreUnknownKeys = true }
 
-    override suspend fun preguntar(idConversacion: Long?, pregunta: String, factura: String?): Llamada<IntercambioAsistente> =
+    override suspend fun preguntar(idConversacion: Long?, pregunta: String): Llamada<IntercambioAsistente> =
         llamarConSesion(cliente) {
             val respuesta = cliente.functions.invoke(Constantes.Asistente.FUNCION) {
                 contentType(ContentType.Application.Json)
@@ -35,7 +35,6 @@ class RepositorioAsistenteSupabase(
                     buildJsonObject {
                         put(Constantes.Asistente.CAMPO_CONVERSACION, idConversacion)
                         put(Constantes.Asistente.CAMPO_MENSAJE, pregunta)
-                        if (factura != null) put(Constantes.Asistente.CAMPO_FACTURA, factura)
                     }.toString(),
                 )
                 // La IA puede tardar más que los 10 s que Supabase espera por defecto.

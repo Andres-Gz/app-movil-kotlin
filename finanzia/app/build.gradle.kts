@@ -71,8 +71,6 @@ dependencies {
     implementation(libs.supabase.postgrest)
     implementation(libs.supabase.functions)
     implementation(libs.ktor.client.okhttp)
-    implementation(libs.mlkit.text.recognition)
-    implementation(libs.androidx.exifinterface)
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
     androidTestImplementation(platform(libs.androidx.compose.bom))

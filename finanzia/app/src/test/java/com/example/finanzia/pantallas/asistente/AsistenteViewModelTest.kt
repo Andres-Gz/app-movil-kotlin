@@ -1,8 +1,6 @@
 package com.example.finanzia.pantallas.asistente
 
 import com.example.finanzia.R
-import com.example.finanzia.datos.facturas.LecturaFactura
-import com.example.finanzia.datos.facturas.LectorFacturas
 import com.example.finanzia.datos.modelos.AccionAsistente
 import com.example.finanzia.datos.modelos.ConversacionAsistente
 import com.example.finanzia.datos.modelos.EstadoAccion
@@ -31,13 +29,12 @@ import org.junit.Test
 class AsistenteViewModelTest {
 
     private val repositorio = RepositorioAsistenteFalso()
-    private val lector = LectorFacturasFalso()
     private lateinit var viewModel: AsistenteViewModel
 
     @Before
     fun preparar() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
-        viewModel = AsistenteViewModel(repositorio, lector)
+        viewModel = AsistenteViewModel(repositorio)
     }
 
     @After
@@ -203,104 +200,7 @@ class AsistenteViewModelTest {
         assertFalse(viewModel.estado.atajosAbiertos)
     }
 
-    @Test
-    fun unaFactura_seLeeYSeLeMandaALaIAConLaPreguntaDeFactura() {
-        viewModel.alElegirFactura(FOTO, PREGUNTA_FACTURA)
-
-        assertEquals(listOf(FOTO), lector.leidas)
-        assertEquals(listOf(Triple(null, PREGUNTA_FACTURA, TEXTO_FACTURA)), repositorio.preguntasConFactura)
-        assertEquals(2, viewModel.estado.mensajes.size)
-        assertFalse(viewModel.estado.leyendoFactura)
-        assertFalse(viewModel.estado.preguntaConFactura)
-    }
-
-    @Test
-    fun unaFactura_vaConLoQueElUsuarioEscribioEnElCampo() {
-        viewModel.alCambiarTexto("  Solo pagué la mitad  ")
-
-        viewModel.alElegirFactura(FOTO, PREGUNTA_FACTURA)
-
-        assertEquals("Solo pagué la mitad", repositorio.preguntasConFactura.single().second)
-        assertEquals("", viewModel.estado.texto)
-    }
-
-    @Test
-    fun mientrasSeLeeLaFactura_muestraQueLaEstaLeyendoYNoDejaMandarOtraCosa() {
-        val pendiente = CompletableDeferred<LecturaFactura>()
-        lector.lectura = { pendiente.await() }
-
-        viewModel.alElegirFactura(FOTO, PREGUNTA_FACTURA)
-        assertTrue(viewModel.estado.leyendoFactura)
-        viewModel.alElegirSugerencia("Hola")
-        viewModel.alElegirFactura(FOTO, PREGUNTA_FACTURA)
-        assertTrue(repositorio.preguntas.isEmpty())
-        assertEquals(1, lector.leidas.size)
-
-        pendiente.complete(LecturaFactura.Leida(TEXTO_FACTURA))
-        assertFalse(viewModel.estado.leyendoFactura)
-        assertEquals(1, repositorio.preguntas.size)
-    }
-
-    @Test
-    fun mientrasLaIARespondeLaFactura_laPreguntaMuestraQueLlevaFactura() {
-        val pendiente = CompletableDeferred<Llamada<IntercambioAsistente>>()
-        repositorio.respuestaPregunta = { pendiente.await() }
-
-        viewModel.alElegirFactura(FOTO, PREGUNTA_FACTURA)
-
-        assertEquals(PREGUNTA_FACTURA, viewModel.estado.preguntaEnviada)
-        assertTrue(viewModel.estado.preguntaConFactura)
-        pendiente.complete(Llamada.Exitosa(intercambio(7, PREGUNTA_FACTURA)))
-        assertFalse(viewModel.estado.preguntaConFactura)
-    }
-
-    @Test
-    fun unaFotoSinTexto_avisaYNoLlamaALaIA() {
-        lector.lectura = { LecturaFactura.SinTexto }
-
-        viewModel.alElegirFactura(FOTO, PREGUNTA_FACTURA)
-
-        assertEquals(R.string.error_factura_sin_texto, viewModel.estado.error)
-        assertTrue(repositorio.preguntas.isEmpty())
-        assertFalse(viewModel.estado.leyendoFactura)
-    }
-
-    @Test
-    fun siNoSePuedeLeerLaFoto_avisaYNoLlamaALaIA() {
-        lector.lectura = { LecturaFactura.Fallida }
-
-        viewModel.alElegirFactura(FOTO, PREGUNTA_FACTURA)
-
-        assertEquals(R.string.error_factura_no_leida, viewModel.estado.error)
-        assertTrue(repositorio.preguntas.isEmpty())
-    }
-
-    @Test
-    fun siLaIANoRespondeLaFactura_alCampoVuelveSoloLoQueEscribioElUsuario() {
-        repositorio.respuestaPregunta = { Llamada.Fallida(ErrorDatos.DESCONOCIDO) }
-
-        viewModel.alElegirFactura(FOTO, PREGUNTA_FACTURA)
-
-        assertEquals("", viewModel.estado.texto)
-        assertEquals(R.string.error_asistente_sin_respuesta, viewModel.estado.error)
-    }
-
-    @Test
-    fun mientrasSeLeeLaFactura_noSeCambiaDeConversacion() {
-        lector.lectura = { CompletableDeferred<LecturaFactura>().await() }
-        viewModel.alElegirFactura(FOTO, PREGUNTA_FACTURA)
-
-        viewModel.alAbrirConversacion(3)
-
-        assertNull(viewModel.estado.idConversacion)
-        assertTrue(viewModel.estado.leyendoFactura)
-    }
-
     private companion object {
-        const val FOTO = "content://com.example.finanzia.archivos/facturas/factura.jpg"
-        const val PREGUNTA_FACTURA = "Registra el gasto de esta factura"
-        const val TEXTO_FACTURA = "TIENDA D1\nTOTAL 23.450"
-
         val ACCION_GASTO = AccionAsistente(TipoAccion.GASTO, 20000.0, categoria = "comida", descripcion = "Almuerzo")
         val CONVERSACION = ConversacionAsistente(3, "Recuerda el 70", "2026-10-27T14:00:00+00:00", "El 70.")
 
@@ -318,28 +218,15 @@ class AsistenteViewModelTest {
         )
     }
 
-    /** Un lector que no abre fotos: devuelve lo que diga cada prueba y anota qué se le pidió leer. */
-    private class LectorFacturasFalso : LectorFacturas {
-        val leidas = mutableListOf<String>()
-        var lectura: suspend () -> LecturaFactura = { LecturaFactura.Leida(TEXTO_FACTURA) }
-
-        override suspend fun leer(imagen: String): LecturaFactura {
-            leidas += imagen
-            return lectura()
-        }
-    }
-
     /** Un repositorio sin internet: responde lo que diga cada prueba y anota lo que se le pidió. */
     private class RepositorioAsistenteFalso : RepositorioAsistente {
         val preguntas = mutableListOf<Pair<Long?, String>>()
-        val preguntasConFactura = mutableListOf<Triple<Long?, String, String>>()
         val confirmadas = mutableListOf<Long>()
         val eliminadas = mutableListOf<Long>()
         var respuestaPregunta: suspend (String) -> Llamada<IntercambioAsistente> = { Llamada.Exitosa(intercambio(7, it)) }
 
-        override suspend fun preguntar(idConversacion: Long?, pregunta: String, factura: String?): Llamada<IntercambioAsistente> {
+        override suspend fun preguntar(idConversacion: Long?, pregunta: String): Llamada<IntercambioAsistente> {
             preguntas += idConversacion to pregunta
-            if (factura != null) preguntasConFactura += Triple(idConversacion, pregunta, factura)
             return respuestaPregunta(pregunta)
         }
 
