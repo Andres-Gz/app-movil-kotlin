@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- La carpeta que la app de cámara puede escribir (debe coincidir con Constantes.Fotos). -->
+<paths>
+    <cache-path
+        name="fotos"
+        path="fotos/" />
+</paths>

@@ -419,7 +419,7 @@
     <string name="asistente_enviando">Enviando…</string>
     <string name="asistente_pensando">Revisando tus datos…</string>
     <string name="asistente_bienvenida_titulo">Hola, soy Finanzia IA</string>
-    <string name="asistente_bienvenida">Pregúntame cuánto puedes gastar, cómo van tus metas o en qué se te va la plata. También puedo registrar un gasto, un ingreso o un aporte, o leer la foto de una factura: tú lo confirmas antes de que se guarde.</string>
+    <string name="asistente_bienvenida">Pregúntame cuánto puedes gastar, cómo van tus metas o en qué se te va la plata. También puedo registrar un gasto, un ingreso o un aporte, o leerlo de la foto de una factura (con el +): tú lo confirmas antes de que se guarde.</string>
     <string name="asistente_ahora">Ahora</string>
     <string name="asistente_hace_minutos">Hace %1$d min</string>
     <string name="asistente_hace_horas">Hace %1$d h</string>
@@ -428,6 +428,9 @@
         <item quantity="other">Hace %1$d días</item>
     </plurals>
     <string name="asistente_escribe">Escribe tu pregunta…</string>
+    <string name="asistente_atajo_foto">Tomar foto de una factura</string>
+    <string name="asistente_foto_etiqueta">📷 Foto de una factura</string>
+    <string name="asistente_sin_camara">Tu teléfono no tiene una app de cámara</string>
     <string name="asistente_atajo_gasto">Registrar un gasto</string>
     <string name="asistente_atajo_gasto_texto">"Registra un gasto de "</string>
     <string name="asistente_atajo_ingreso">Registrar un ingreso</string>
@@ -455,13 +458,6 @@
     <string name="asistente_historial_sin_titulo">Conversación</string>
     <string name="asistente_sin_dictado">Tu teléfono no tiene dictado por voz</string>
     <string name="asistente_dictado_indicacion">¿Qué le quieres preguntar a Finanzia IA?</string>
-    <string name="asistente_factura_camara">Foto de una factura</string>
-    <string name="asistente_factura_galeria">Factura de la galería</string>
-    <string name="asistente_factura_pregunta">Registra el gasto de esta factura</string>
-    <string name="asistente_factura_leyendo">Leyendo tu factura…</string>
-    <string name="asistente_factura_adjunta">Factura escaneada</string>
-    <string name="asistente_sin_camara">Tu teléfono no tiene una app de cámara</string>
-    <string name="asistente_sin_galeria">Tu teléfono no tiene una galería de fotos</string>
 
     <!-- Errores de validación (los saltos de línea de los avisos son los del diseño) -->
     <string name="error_campos_incompletos">Por favor completa todos los campos para\ncontinuar</string>
@@ -511,8 +507,8 @@
     <string name="error_asistente_accion">No pudimos guardar el cambio. Inténtalo de nuevo.</string>
     <string name="error_asistente_eliminar">No pudimos eliminar la conversación. Inténtalo de nuevo.</string>
     <string name="error_asistente_historial">No pudimos cargar tus conversaciones. Inténtalo de nuevo.</string>
-    <string name="error_factura_sin_texto">No encontramos texto en la foto. Tómala de nuevo de frente, con buena luz y con la factura completa.</string>
-    <string name="error_factura_no_leida">No pudimos leer la foto de la factura. Inténtalo de nuevo.</string>
+    <string name="error_foto_sin_texto">No pudimos leer texto en esa foto. Tómala de cerca y con buena luz.</string>
+    <string name="error_foto_muy_larga">Esa foto tiene demasiado texto. Tómale la foto solo a la factura.</string>
 
     <!-- Errores de conexión -->
     <string name="error_sin_conexion">No hay conexión. Revisa tu internet e inténtalo de nuevo</string>

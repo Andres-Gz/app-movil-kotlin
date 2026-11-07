@@ -19,6 +19,7 @@ import androidx.compose.material.icons.outlined.HighlightOff
 import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.Lightbulb
 import androidx.compose.material.icons.outlined.Mic
+import androidx.compose.material.icons.outlined.PhotoCamera
 import androidx.compose.material.icons.outlined.Savings
 import androidx.compose.material.icons.outlined.Verified
 import androidx.compose.material.icons.outlined.Laptop
@@ -40,8 +41,6 @@ import androidx.compose.material.icons.outlined.Forum
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.Payments
-import androidx.compose.material.icons.outlined.PhotoCamera
-import androidx.compose.material.icons.outlined.PhotoLibrary
 import androidx.compose.material.icons.outlined.PriceCheck
 import androidx.compose.material.icons.outlined.ShoppingCart
 import androidx.compose.material.icons.outlined.SmartToy
@@ -210,9 +209,8 @@ object Iconos {
     val idea: ImageVector = Icons.Outlined.Lightbulb
     val alcanciaContorno: ImageVector = Icons.Outlined.Savings
     val microfono: ImageVector = Icons.Outlined.Mic
+    val camara: ImageVector = Icons.Outlined.PhotoCamera
     val enviar: ImageVector = salida
-    val fotoFactura: ImageVector = Icons.Outlined.PhotoCamera
-    val galeriaFactura: ImageVector = Icons.Outlined.PhotoLibrary
 }
 
 /** Lado de la cuadrícula en la que se dibujan los iconos propios. */

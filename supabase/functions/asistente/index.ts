@@ -1,8 +1,8 @@
 // Edge Function "asistente": el chat de Finanzia con Claude.
 //
 // La app manda {"id_conversacion": 12, "mensaje": "..."} (id_conversacion vacío para un chat nuevo) con
-// el token de la sesión, y recibe la pregunta y la respuesta ya guardadas. Si el usuario le tomó una foto
-// a una factura, también manda "factura": el texto que la app leyó de la foto (OCR, en el teléfono).
+// el token de la sesión, y recibe la pregunta y la respuesta ya guardadas. Si el usuario tomó una foto,
+// también manda "texto_foto": lo que el OCR del teléfono leyó en ella; va a la IA pero no se guarda.
 //   1. Comprueba la sesión. Sin una sesión válida no se llama a la IA (cada llamada cuesta).
 //   2. Lee los mensajes anteriores de la conversación: son la memoria del chat.
 //   3. Le pregunta a Claude (conversacion.ts), que usa las herramientas de herramientas.ts para leer los
@@ -17,8 +17,7 @@ import { type MensajeGuardado, responder } from "./conversacion.ts";
 import { ErrorBaseDatos, llamarFuncion } from "./herramientas.ts";
 
 const LARGO_MAXIMO_PREGUNTA = 2000;
-// El mismo límite que pone la app al texto leído de una factura (Constantes.Facturas.LARGO_MAXIMO_TEXTO).
-const LARGO_MAXIMO_FACTURA = 8000;
+const LARGO_MAXIMO_FOTO = 8000;
 // Código de Postgres cuando la conversación no existe o es de otra persona.
 const NO_ENCONTRADO = "P0002";
 
@@ -42,9 +41,11 @@ Deno.serve(async (peticion) => {
   const cuerpo = await peticion.json().catch(() => null);
   const pregunta = typeof cuerpo?.mensaje === "string" ? cuerpo.mensaje.trim() : "";
   const conversacion = Number.isInteger(cuerpo?.id_conversacion) ? cuerpo.id_conversacion as number : null;
+  const textoFoto = typeof cuerpo?.texto_foto === "string" ? cuerpo.texto_foto.trim() : null;
   if (!pregunta || pregunta.length > LARGO_MAXIMO_PREGUNTA) return responderJson(400, { error: "pregunta_no_valida" });
-  const factura = leerFactura(cuerpo?.factura);
-  if (factura === undefined) return responderJson(400, { error: "factura_no_valida" });
+  if (textoFoto !== null && (!textoFoto || textoFoto.length > LARGO_MAXIMO_FOTO)) {
+    return responderJson(400, { error: "foto_no_valida" });
+  }
 
   try {
     const historial = conversacion === null
@@ -56,27 +57,19 @@ Deno.serve(async (peticion) => {
       await nombreDelUsuario(supabase),
       historial,
       pregunta,
-      factura,
+      textoFoto,
     );
     const guardado = await llamarFuncion(supabase, "guardar_intercambio_asistente", {
       p_conversacion: conversacion,
       p_pregunta: pregunta,
       p_respuesta: respuesta.texto,
       p_accion: respuesta.accion,
-      p_factura: factura,
     });
     return responderJson(200, guardado);
   } catch (error) {
     return responderError(error);
   }
 });
-
-/** El texto de la factura: `null` si no mandó, `undefined` si lo que mandó no sirve. */
-function leerFactura(valor: unknown): string | null | undefined {
-  if (valor === undefined || valor === null) return null;
-  const texto = typeof valor === "string" ? valor.trim() : "";
-  return texto && texto.length <= LARGO_MAXIMO_FACTURA ? texto : undefined;
-}
 
 /** La clave publicable con que llamó la app; si no la mandó, la del proyecto. */
 function clavePublica(peticion: Request): string {

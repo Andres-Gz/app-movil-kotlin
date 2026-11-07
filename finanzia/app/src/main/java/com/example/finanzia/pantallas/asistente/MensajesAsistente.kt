@@ -33,29 +33,19 @@ import com.example.finanzia.tema.Iconos
 import com.example.finanzia.utilidades.leerFechaMovimiento
 import java.util.Date
 
-/**
- * La pregunta del usuario, en azul y a la derecha, con su hora debajo (o "Enviando…" mientras se manda).
- * Si trajo la foto de una factura ([conFactura]), arriba del texto dice "Factura escaneada".
- */
+/** La pregunta del usuario, en azul y a la derecha, con su hora debajo (o "Enviando…" mientras se manda). */
 @Composable
-internal fun BurbujaUsuario(texto: String, pie: String, conFactura: Boolean = false) {
+internal fun BurbujaUsuario(texto: String, pie: String) {
     Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.End) {
-        Column(
+        Text(
+            text = texto,
+            style = EstilosTexto.mensaje,
+            color = Colores.textoSobreColor,
             modifier = Modifier
                 .padding(start = Dimensiones.sangriaBurbuja)
                 .background(Colores.azulIntenso, RoundedCornerShape(Dimensiones.radioCampo))
                 .padding(horizontal = Dimensiones.rellenoHorizontalBurbuja, vertical = Dimensiones.rellenoVerticalBurbuja),
-        ) {
-            if (conFactura) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Iconos.recibo, null, tint = Colores.textoSobreColor, modifier = Modifier.size(Dimensiones.tamanoIconoMediano))
-                    Spacer(Modifier.width(Dimensiones.espacioMinimo))
-                    Text(text = stringResource(R.string.asistente_factura_adjunta), style = EstilosTexto.notaFuerte, color = Colores.textoSobreColor)
-                }
-                Spacer(Modifier.height(Dimensiones.espacioMinimo))
-            }
-            Text(text = texto, style = EstilosTexto.mensaje, color = Colores.textoSobreColor)
-        }
+        )
         Spacer(Modifier.height(Dimensiones.espacioMinimo))
         Text(text = pie, style = EstilosTexto.ayuda, color = Colores.grisContorno)
     }
@@ -125,10 +115,10 @@ internal fun RespuestaGuardada(mensaje: MensajeAsistente, ahora: Date, contenido
     )
 }
 
-/** Mientras la IA responde (o se lee una factura, con otro [titulo]): su tarjeta con un indicador de carga. */
+/** Mientras la IA responde: su tarjeta con un indicador de carga. */
 @Composable
-internal fun TarjetaPensando(titulo: String = stringResource(R.string.asistente_pensando)) {
-    TarjetaRespuesta(titulo = titulo, texto = "", antiguedad = null) {
+internal fun TarjetaPensando() {
+    TarjetaRespuesta(titulo = stringResource(R.string.asistente_pensando), texto = "", antiguedad = null) {
         Spacer(Modifier.height(Dimensiones.espacioMediano))
         CircularProgressIndicator(
             color = Colores.verdeSeguro,

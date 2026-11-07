@@ -32,7 +32,13 @@ android {
 
         buildConfigField("String", "SUPABASE_URL", "\"${propiedadLocal("supabase.url")}\"")
         buildConfigField("String", "SUPABASE_CLAVE", "\"${propiedadLocal("supabase.clave")}\"")
+
+        // El OCR trae una librería nativa de 11 MB por arquitectura: x86 ya no se usa ni en emuladores.
+        ndk { abiFilters += listOf("arm64-v8a", "armeabi-v7a", "x86_64") }
     }
+
+    // Comprime esas librerías dentro del APK, que si no pesa unos 30 MB más.
+    packaging { jniLibs { useLegacyPackaging = true } }
 
     buildTypes {
         release {
@@ -71,8 +77,7 @@ dependencies {
     implementation(libs.supabase.postgrest)
     implementation(libs.supabase.functions)
     implementation(libs.ktor.client.okhttp)
-    implementation(libs.mlkit.text.recognition)
-    implementation(libs.androidx.exifinterface)
+    implementation(libs.mlkit.texto)
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
     androidTestImplementation(platform(libs.androidx.compose.bom))
