@@ -85,7 +85,11 @@ El proyecto usa Gradle 8.14, que funciona con Java 17 a 24. Las versiones más n
 
 1. Toca **Crear cuenta** y registra un nombre, un correo y una contraseña (8 caracteres o más, con un número y una mayúscula). No hay que confirmar el correo: se entra de una vez.
 2. En la bienvenida, **Comenzar ahora** lleva a registrar el primer ingreso y el primer gasto. Después se llega al inicio.
-3. Al final del inicio, **Conversar con Finanzia IA** abre el chat. Prueba:
+3. Para abrir el chat, en el inicio **desliza hasta abajo**: el botón **Conversar con Finanzia IA** está después de los movimientos recientes.
+
+   <img src="docs/capturas/boton-chat.png" width="260" alt="El botón Conversar con Finanzia IA, al final del inicio">
+
+   En el chat, prueba:
    - "¿Cuánto gasté este mes?": responde con tus datos.
    - "Gasté 20 mil en almuerzo": propone el gasto y lo guarda solo si tocas **Confirmar**.
    - "¿Cuándo murió Hitler?": no responde, porque solo habla de tus finanzas y de la app.
