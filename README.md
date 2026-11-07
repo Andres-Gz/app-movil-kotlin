@@ -1,29 +1,113 @@
 # Finanzia
 
-Tu asistente financiero con IA. App Android hecha con Kotlin y Jetpack Compose.
+Tu asistente financiero con IA. App Android nativa, hecha con Kotlin y Jetpack Compose, para llevar los ingresos, los gastos y las metas de ahorro, con un chat de IA que consulta tus datos y registra movimientos, incluso desde la foto de una factura.
 
-> **Estado:** en desarrollo. Tiene inicio de sesión, registro y recuperación de contraseña (con Supabase), la bienvenida y los primeros pasos, el inicio con los movimientos (que se pueden editar), las metas de ahorro y el chat con Finanzia IA, que también registra gastos e ingresos desde la foto de una factura.
+> **Estado:** versión funcional en la rama `main`. Tiene registro, inicio de sesión y recuperación de contraseña, la bienvenida y los primeros pasos, el inicio con el balance y los movimientos (que se pueden editar o eliminar), las metas de ahorro con sus aportes y el chat con Finanzia IA.
 
-## Requisitos
+## Entrega
 
-- [Android Studio](https://developer.android.com/studio) reciente. Trae su propio JDK, así que no hace falta instalar Java aparte.
-- Android SDK 36. Android Studio lo descarga al abrir el proyecto.
-- Un emulador o un teléfono con Android 7.0 (API 24) o superior.
+| | |
+|---|---|
+| Repositorio | <https://github.com/Andres-Gz/app-movil-kotlin> |
+| Rama con la última versión funcional | `main` |
+| Integrante | [Andres-Gz](https://github.com/Andres-Gz) |
+| Tecnologías | Kotlin 2.2, Jetpack Compose, Supabase (Auth, PostgreSQL y Edge Functions), ML Kit y Claude Opus 5.5 |
 
-## Configuración
+## Capturas
 
-La app se conecta a [Supabase](https://supabase.com). Los datos de conexión no van en el código ni en el repositorio: cada quien los pone en `finanzia/local.properties`, un archivo que git ignora.
+| Inicio de sesión | Inicio | Metas | Chat | Foto de una factura |
+|:-:|:-:|:-:|:-:|:-:|
+| <img src="docs/capturas/inicio-sesion.png" width="160" alt="Pantalla de inicio de sesión"> | <img src="docs/capturas/inicio.png" width="160" alt="Inicio con el balance, el consejo y la meta"> | <img src="docs/capturas/metas.png" width="160" alt="Metas de ahorro"> | <img src="docs/capturas/asistente.png" width="160" alt="Chat con Finanzia IA y el menú del +"> | <img src="docs/capturas/factura.png" width="160" alt="La IA propone el gasto leído de una factura"> |
 
-```properties
-supabase.url=https://<tu-proyecto>.supabase.co
-supabase.clave=sb_publishable_...
+Las capturas del inicio, las metas y la factura usan datos de ejemplo.
+
+## Cómo instalarla y probarla
+
+La base de datos, las funciones y la IA ya están montadas en Supabase, así que **no hay que crear nada**: solo compilar la app con los datos de conexión del paso 3.
+
+```mermaid
+flowchart TD
+    A["1. Descargar el código<br/>(rama main)"] --> B["2. Abrir la carpeta finanzia/<br/>en Android Studio"]
+    B --> C["3. Pegar los datos de conexión<br/>en finanzia/local.properties"]
+    C --> D{"¿Gradle sincroniza?"}
+    D -- No --> E["4. Elegir JDK 17 o 21<br/>como Gradle JDK"]
+    E --> F
+    D -- Sí --> F["5. Run ▶ en un emulador<br/>o generar el APK"]
+    F --> G["6. Crear una cuenta en la app<br/>y probarla"]
 ```
 
-Pide los valores al equipo. Usa solo la clave **publicable** (`sb_publishable_…`): la secreta nunca va en la app. Si falta alguna, Gradle no compila y te dice cuál.
+### Requisitos
 
-### Supabase (una sola vez por proyecto)
+- [Android Studio](https://developer.android.com/studio) de 2025 o más reciente (el proyecto usa AGP 8.13). Descarga solo el Android SDK 36 al abrir el proyecto.
+- JDK 17 o 21 para Gradle. Si tu Android Studio trae uno más nuevo, mira el [paso 4](#4-si-gradle-no-sincroniza-jdk).
+- Un emulador o un teléfono con Android 7.0 (API 24) o superior, con internet.
 
-Para que el registro, el inicio de sesión y la recuperación de contraseña funcionen, en el panel de Supabase:
+### 1. Descargar el código
+
+```bash
+git clone https://github.com/Andres-Gz/app-movil-kotlin.git
+```
+
+O en GitHub: **Code → Download ZIP**, y descomprímelo. Ponlo en una carpeta local, **fuera de OneDrive** o de cualquier carpeta sincronizada con la nube (ver [Problemas conocidos](#problemas-conocidos)).
+
+### 2. Abrir el proyecto
+
+En Android Studio: **File → Open** y elige la carpeta **`finanzia`** que está dentro del repositorio, no la raíz. Si pregunta, pulsa **Trust Project**.
+
+### 3. Datos de conexión
+
+Al abrir el proyecto, Android Studio crea el archivo `finanzia/local.properties` con una línea `sdk.dir` (déjala como está). Ábrelo y agrega al final estas dos líneas:
+
+```properties
+supabase.url=https://gwzpupyqdiyxmnzczmwd.supabase.co
+supabase.clave=sb_publishable_W-qeTNYs6UaTH_YpNauXDQ_XZYt3S5l
+```
+
+Luego pulsa **File → Sync Project with Gradle Files**. Si no ves el archivo, cambia el panel de la izquierda de la vista **Android** a la vista **Project**. Si no existe, créalo en la carpeta `finanzia/`.
+
+Es la clave **publicable** de Supabase, hecha para ir dentro de la app: lo que protege los datos son las reglas RLS de la base, que solo dejan a cada cuenta ver lo suyo. La clave secreta y la llave de la IA nunca salen del servidor. Si falta alguna de las dos líneas, Gradle no compila y dice cuál.
+
+### 4. Si Gradle no sincroniza (JDK)
+
+El proyecto usa Gradle 8.14, que funciona con Java 17 a 24. Las versiones más nuevas de Android Studio traen Java 25, y con él la sincronización falla (a veces el error solo dice `25.0.3`). Para arreglarlo:
+
+1. **File → Settings** (en Mac, **Android Studio → Settings**) **→ Build, Execution, Deployment → Build Tools → Gradle**.
+2. En **Gradle JDK**, elige un JDK 17 o 21. Si no hay ninguno, usa **Download JDK…** y descarga la versión 17.
+3. **OK** y otra vez **File → Sync Project with Gradle Files**.
+
+### 5. Ejecutar o generar el APK
+
+- **En un emulador:** si no tienes uno, créalo en **Device Manager**. Elígelo arriba y pulsa **Run ▶**.
+- **En un teléfono:** activa las opciones de desarrollador y la depuración USB, conéctalo, elígelo arriba y pulsa **Run ▶**.
+- **Solo el APK:** **Build → Generate App Bundles or APKs → Generate APKs** (en versiones anteriores: **Build → Build Bundle(s) / APK(s) → Build APK(s)**). Queda en `finanzia/app/build/outputs/apk/debug/app-debug.apk`; cópialo al teléfono e instálalo, permitiendo instalar apps de origen desconocido.
+
+### 6. Probarla
+
+1. Toca **Crear cuenta** y registra un nombre, un correo y una contraseña (8 caracteres o más, con un número y una mayúscula). No hay que confirmar el correo: se entra de una vez.
+2. En la bienvenida, **Comenzar ahora** lleva a registrar el primer ingreso y el primer gasto. Después se llega al inicio.
+3. Al final del inicio, **Conversar con Finanzia IA** abre el chat. Prueba:
+   - "¿Cuánto gasté este mes?": responde con tus datos.
+   - "Gasté 20 mil en almuerzo": propone el gasto y lo guarda solo si tocas **Confirmar**.
+   - "¿Cuándo murió Hitler?": no responde, porque solo habla de tus finanzas y de la app.
+   - **"+" → Tomar foto de una factura**: lee la factura en el teléfono y propone el gasto. En el emulador la cámara muestra una escena de prueba sin texto, así que esto se prueba mejor en un teléfono.
+
+## Comandos
+
+Desde la carpeta `finanzia/` (en Windows usa `gradlew.bat`), con `JAVA_HOME` apuntando a un JDK 17 o 21:
+
+| Para… | Comando |
+|---|---|
+| Compilar | `./gradlew assembleDebug` |
+| Instalar en el emulador o teléfono conectado | `./gradlew installDebug` |
+| Pruebas unitarias | `./gradlew testDebugUnitTest` |
+| Pruebas en el emulador (necesitan uno abierto) | `./gradlew connectedDebugAndroidTest` |
+| Revisión de código (lint) | `./gradlew lintDebug` |
+
+## Montar otro proyecto de Supabase (opcional)
+
+Para probar la app no hace falta: basta con los datos del [paso 3](#3-datos-de-conexión). Esto es solo para usar un proyecto de Supabase propio; en ese caso, en `local.properties` van su URL y su clave **publicable** (`sb_publishable_…`), nunca la secreta.
+
+En el panel del proyecto nuevo:
 
 1. **SQL Editor → New query**, en este orden (cada archivo se pega y se pulsa **Run**; se pueden volver a correr sin problema):
    - [`supabase/esquema.sql`](supabase/esquema.sql): crea las tablas, solo si el proyecto es nuevo.
@@ -47,25 +131,6 @@ Para que el registro, el inicio de sesión y la recuperación de contraseña fun
       ```
       `--no-verify-jwt` deja que la función revise la sesión ella misma (así funciona también con las claves publicables nuevas); sin una sesión válida responde 401 y no llama a la IA.
    4. Si el chat responde "Finanzia IA no pudo responder", el motivo queda en **Edge Functions → asistente → Logs** (por ejemplo, que falta el secreto o que la llave no tiene saldo).
-
-## Cómo ejecutarla
-
-1. Clona el repositorio en una carpeta local, **fuera de OneDrive** o de cualquier carpeta sincronizada con la nube (ver [Problemas conocidos](#problemas-conocidos)).
-2. Crea o edita `finanzia/local.properties` con los datos de conexión (ver [Configuración](#configuración)).
-3. En Android Studio: **File → Open** y elige la carpeta `finanzia/`, no la raíz del repositorio.
-4. Espera a que termine la sincronización de Gradle, elige un emulador y pulsa **Run ▶**.
-
-También se puede desde la terminal, dentro de `finanzia/` (en Windows usa `gradlew.bat`):
-
-| Para… | Comando |
-|---|---|
-| Compilar | `./gradlew assembleDebug` |
-| Instalar en el emulador o teléfono conectado | `./gradlew installDebug` |
-| Pruebas unitarias | `./gradlew testDebugUnitTest` |
-| Pruebas de pantalla (necesitan un emulador abierto) | `./gradlew connectedDebugAndroidTest` |
-| Revisión de código (lint) | `./gradlew lintDebug` |
-
-Si la terminal no encuentra Java, usa el JDK que trae Android Studio. En Windows: `JAVA_HOME=C:\Program Files\Android\Android Studio\jbr`.
 
 ## Organización de los archivos
 
@@ -129,6 +194,17 @@ La app se arma por capas, como piezas de construcción:
    - La lógica pura, como las validaciones, va en su propio archivo (`Validador<X>.kt`) para probarla sin emulador.
 4. **Datos (`datos/`)**: el ViewModel nunca habla directo con Supabase. Le pide los datos a un **repositorio**, que es una interfaz (`RepositorioSesion`) con su implementación (`RepositorioSesionSupabase`), y lo recibe por su constructor. Las tablas se mapean a `data class` en `modelos/`. En las pruebas se usa un repositorio falso, así no hace falta internet.
 
+```mermaid
+flowchart TD
+    P["Pantalla (Compose)"] -- "evento: alPulsarEntrar()" --> V["ViewModel + Estado"]
+    V -- "estado nuevo" --> P
+    V --> R["Repositorio (interfaz)"]
+    V --> L["LectorTexto: OCR con ML Kit, en el teléfono"]
+    R --> S["Supabase: Auth y funciones SQL con RLS"]
+    R --> F["Edge Function asistente"]
+    F --> C["Claude (Anthropic)"]
+```
+
 Una pantalla no navega por su cuenta: avisa con callbacks (`alIniciarSesion`, `alRegistrarse`…) y `ActividadPrincipal` decide a dónde ir. Por ahora guarda en una variable qué pantalla se ve (con pocas pantallas no hace falta una librería de navegación).
 
 Si vienes de Spring Boot, la equivalencia es:
@@ -158,7 +234,7 @@ Cada tipo de valor vive en **un solo archivo**. Si necesitas uno que no existe, 
 | Iconos | `tema/Iconos.kt` | `Icons.…` |
 | Textos (incluidos los de accesibilidad) | `res/values/strings.xml` | cualquier texto que vea el usuario |
 | Constantes internas (nombres de tablas, mensajes de Logcat, patrones de validación) | `configuracion/Constantes.kt`, agrupadas por tema (`Constantes.BaseDatos`, `Constantes.Registro`…) | cualquier texto o valor suelto en el código |
-| Datos de conexión (URL y clave de Supabase) | `local.properties`, que no se sube | el código y cualquier archivo del repositorio |
+| Datos de conexión (URL y clave publicable de Supabase) | `local.properties`, que no se sube (los del proyecto de la entrega están en el [paso 3](#3-datos-de-conexión)) | el código |
 
 ```kotlin
 // ✗ Así no
@@ -252,4 +328,8 @@ En español, contando qué cambia y por qué. El asunto es corto y en presente, 
 
 ## Problemas conocidos
 
+- **Gradle no sincroniza y el error dice `25.0.x` o `Unsupported class file major version`**: Android Studio está usando Java 25. Elige un JDK 17 o 21 como se explica en el [paso 4](#4-si-gradle-no-sincroniza-jdk).
+- **`Falta "supabase.url" en local.properties`**: faltan las dos líneas del [paso 3](#3-datos-de-conexión).
+- **"Finanzia IA no pudo responder"**: revisa el internet y vuelve a intentar. Si sigue, el motivo queda en Supabase, en **Edge Functions → asistente → Logs**.
+- **La foto de una factura en el emulador dice "No pudimos leer texto en esa foto"**: la cámara del emulador muestra una escena de prueba sin texto. Pruébalo en un teléfono con una factura de verdad.
 - **Proyecto dentro de OneDrive** u otra carpeta sincronizada: Gradle falla con `Unable to delete directory…` o `Cannot snapshot… not a regular file`. Clona el repositorio de nuevo en una carpeta local, por ejemplo `C:\dev\`. Si solo lo mueves, los archivos pueden conservar la marca de OneDrive y el error sigue.
